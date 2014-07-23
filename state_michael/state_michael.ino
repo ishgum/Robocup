@@ -127,6 +127,12 @@ void find_error (void) {
 }
 
 
+void find_Wall (void) {
+    front_Distance = analogRead(ana_frontDistance);
+    if (front_Distance > 500) {
+      stop_motors()
+      left
+
 
 
 void loop() {
@@ -138,12 +144,9 @@ void loop() {
   }
   
   
-  front_Distance = analogRead(ana_frontDistance);
-  
-  
   Serial.print(analogRead(ana_leftDistance));
   Serial.print(analogRead(ana_rightDistance));
-  Serial.println(front_Distance));
+  Serial.println(analogRead(ana_frontDistance));
   
   if (current_state == ON) {
     find_error();
