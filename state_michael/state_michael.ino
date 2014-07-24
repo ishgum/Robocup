@@ -48,10 +48,7 @@ int error = 0;
 float angles[3];
 FreeSixIMU sixDOF = FreeSixIMU();
 HMC5883L compass;
-
-  
-  
-  
+ 
   
 void setup() {
   Serial.begin(9600);
@@ -128,10 +125,13 @@ void find_error (void) {
 
 
 void find_Wall (void) {
-    front_Distance = analogRead(ana_frontDistance);
+    int front_Distance = analogRead(ana_frontDistance);
     if (front_Distance > 500) {
-      stop_motors()
-      left
+      stop_motors();
+      leftWheel.write(90);
+      rightWheel.write(90);
+    }
+}
 
 
 
@@ -140,7 +140,7 @@ void loop() {
   check_state();
   
   if (current_state == OFF) {
-    stop_motors()
+    stop_motors();
   }
   
   
@@ -153,7 +153,7 @@ void loop() {
     
     if (action_state == STRAIGHT) {
       leftWheel.write(140 + error*3);
-      rightWheel.write(140 - error*3);cat rea
+      rightWheel.write(140 - error*3); //cat rea
     }
     
     if (action_state == TURNING) {      
