@@ -24,8 +24,8 @@ Servo rightWheel;                 // a maximum of eight servo objects can be cre
 Servo sweep;
 
 int ana_frontDistance = 4; // analogue input pin
-int ana_leftDistance = 1;
-int ana_rightDistance = 0;
+int ana_leftDistance = 0;
+int ana_rightDistance = 1;
 int ana_onoff = 3;
 
 // State things
@@ -50,7 +50,9 @@ FreeSixIMU sixDOF = FreeSixIMU();
 HMC5883L compass;
 
   
-  
+// RTOS
+
+unsigned long tick = 0;
   
   
 void setup() {
@@ -60,6 +62,8 @@ void setup() {
   //sweep.attach(11); //S10 (on port S5)
   //sweep.write(0);
   
+  Serial.println("Got here");
+  
   delay(5);
   sixDOF.init(); //init the Acc and Gyro
   delay(5);
@@ -67,8 +71,15 @@ void setup() {
   
   compass.SetMeasurementMode(Measurement_Continuous);
   
+  Serial.println("Got here 2");
+  
   sixDOF.getEuler(angles);
+  
+  Serial.println("Got here 3");
+  
   float desiredAngle = angles[0];
+  
+  Serial.println("Got here 4");
 }
 
 
@@ -76,11 +87,11 @@ void setup() {
 
 // State check with debouncing
 void check_state (void) {
-  if (analogRead(ana_onoff) == 0) {
+  if (analogRead(ana_onoff) != 0 && current_state == OFF) {
    state_off = 0;
    state_on += 1;
   }
-  if (analogRead(ana_onoff) != 0) {
+  if (analogRead(ana_onoff) == 0 && current_state == ON) {
    state_on = 0;
    state_off += 1;
   }
@@ -128,10 +139,15 @@ void find_error (void) {
 
 
 void find_Wall (void) {
-    front_Distance = analogRead(ana_frontDistance);
+    int front_Distance = analogRead(ana_frontDistance);
     if (front_Distance > 500) {
-      stop_motors()
-      left
+      stop_motors();
+      if (analogRead(ana_leftDistance) > 300) {
+        turning = CLOCKWISE;
+      }
+    }
+}
+      
 
 
 
@@ -140,20 +156,23 @@ void loop() {
   check_state();
   
   if (current_state == OFF) {
-    stop_motors()
+    stop_motors();
   }
   
-  
-  Serial.print(analogRead(ana_leftDistance));
-  Serial.print(analogRead(ana_rightDistance));
-  Serial.println(analogRead(ana_frontDistance));
+  if (tick % 5000 == 0) {
+  Serial.print("Left: "); Serial.print(analogRead(ana_leftDistance));
+  Serial.print("\t Right: "); Serial.print(analogRead(ana_rightDistance));
+  Serial.print("\t Front: "); Serial.println(analogRead(ana_frontDistance));
+  }
   
   if (current_state == ON) {
-    find_error();
+    if (tick % 1000 == 0) {
+      find_error();
+    }
     
     if (action_state == STRAIGHT) {
       leftWheel.write(140 + error*3);
-      rightWheel.write(140 - error*3);cat rea
+      rightWheel.write(140 - error*3);
     }
     
     if (action_state == TURNING) {      
@@ -165,4 +184,5 @@ void loop() {
       }
     }
   }
+  tick++;
 }
