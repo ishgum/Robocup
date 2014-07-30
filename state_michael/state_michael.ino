@@ -4,6 +4,7 @@
 #include <FreeSixIMU.h>
 #include <HMC5883L.h>
 
+#include "Sensors.h"
 
 
 /**** SET UP ****/
@@ -12,18 +13,6 @@
 #define DIGITAL_OUT_POWER 49
 #define FILTER_SIZE 10
 
-#define TRUE 0
-#define FALSE 1
-
-struct Sensor {
-  
-  unsigned int port;
-  unsigned int currentRead;
-  unsigned int index;
-  unsigned int filterArray[FILTER_SIZE];
-  unsigned int filteredRead;
-  unsigned int found;
-};
 
 
 // State defines
@@ -45,9 +34,9 @@ Servo rightWheel;                 // a maximum of eight servo objects can be cre
 Servo sweep;
 
 
-Sensor infaFront;
-Sensor infaLeft;
-Sensor infaRight;
+Sensors infaFront(4);
+Sensors infaLeft(0);
+Sensors infaRight(1);
 
 int ana_onoff = 3; // analogue input pin
 
@@ -92,20 +81,7 @@ void setup() {
   Serial.begin(9600);
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13);  // S12 (on port S6)
-
-  // Intialising sensors
-  infaFront.port = 4;
-  infaLeft.port = 0;
-  infaRight.port = 1;
-  
-  infaFront.index = 0;
-  infaLeft.index = 0;
-  infaRight.index = 0;
-  
-  infaFront.found = FALSE;
-  infaLeft.found = FALSE
-  infaRight.found = FALSE;
-  
+ 
   //Initialising magnet sensor
   delay(5);
   sixDOF.init(); //init the Acc and Gyro
