@@ -12,9 +12,6 @@
 #define DIGITAL_OUT_POWER 49
 #define FILTER_SIZE 10
 
-#define TRUE 0
-#define FALSE 1
-
 struct Sensor {
   
   unsigned int port;
@@ -22,7 +19,6 @@ struct Sensor {
   unsigned int index;
   unsigned int filterArray[FILTER_SIZE];
   unsigned int filteredRead;
-  unsigned int found;
 };
 
 
@@ -36,7 +32,6 @@ struct Sensor {
 #define CLOCKWISE 1
 #define ANTI_CLOCKWISE -1
 
-#define WALL_FOLLOW 0
 
 // Peripherals
 
@@ -59,9 +54,8 @@ int turning = CLOCKWISE;
 int state_on = 0;
 int state_off = 0;
 int on_state = OFF;
-int current_state = WALL_FOLLOW;
 int action_state = STRAIGHT;
-int following_wall = 0;
+int following_state = ANTI_CLOCKWISE;
 
 
 // Measurement variables
@@ -102,10 +96,6 @@ void setup() {
   infaLeft.index = 0;
   infaRight.index = 0;
   
-  infaFront.found = FALSE;
-  infaLeft.found = FALSE
-  infaRight.found = FALSE;
-  
   //Initialising magnet sensor
   delay(5);
   sixDOF.init(); //init the Acc and Gyro
@@ -135,6 +125,7 @@ void check_on (void) {
   
   if (state_on == 10) {
     on_state = ON;
+    desiredAngle = angles[0];
   }
   if (state_off == 10) {
     on_state = OFF;
@@ -152,7 +143,6 @@ void stop_motors (void) {
 
 
 // Finds the error between the current angle and the desired
-
 void find_error (void) {
   sixDOF.getEuler(angles);
   error = desiredAngle - angles[0]; 
@@ -160,11 +150,9 @@ void find_error (void) {
 
 
 // If the robot drives up to a wall, stop and then determine which direction it should turn
-
 void find_Wall (void) {
 
     if (infaFront.filteredRead > 500) {
-      
       stop_motors();
       action_state = TURNING;
       if (infaLeft.filteredRead > 300) {
@@ -181,7 +169,6 @@ void find_Wall (void) {
 
 
 // Updates a single sensor using a MAF
-
 struct Sensor updateSensor (Sensor sensor) {
   sensor.currentRead = analogRead(sensor.port);
   sensor.filterArray[sensor.index] = sensor.currentRead;
@@ -209,49 +196,33 @@ void updateSensors (void) {
 
 
 
-void determine_follow_wall(void) {
+void check_following_state(void) {
   if (infaLeft.filteredRead > infaRight.filteredRead) {
-    following_wall = infaLeft.filteredRead;
+    following_state = CLOCKWISE;
   }
   else {
-    following_wall = infaRight.filteredRead;
+    following_state = ANTI_CLOCKWISE;
   }
 }
 
 
-void drive_straight (int desired_speed, int straight_error) {
-    
-    leftWheel.write(desired_speed + straight_error);
-    rightWheel.write(desired_speed - straight_error);
-}
 
-
-void follow_wall_mode (void) {
-  find_wall();
-  determine_follow_wall();
+void follow_wall (void) {
+  check_following_state();
   if (action_state == STRAIGHT) {
-    int straight_error = error + (following_wall - 400)/20;
-    drive_straight (140, straight_error);
-  }
+      leftWheel.write(140 + error*3);
+      rightWheel.write(140 - error*3);
+    }
     
   if (action_state == TURNING) {      
     leftWheel.write((90 + turning*30));
     rightWheel.write((90 - turning*30));
-    
-    if (abs(error) < 10) {
-        action_state = STRAIGHT;
-    }
-  } 
+  }
+  if (abs(error) < 10) {
+      action_state = STRAIGHT;
+  }
 }
   
-
-
-
-void random_search_mode (void) {
-  
-
-
-
 
 
 void loop() {
@@ -270,7 +241,7 @@ void loop() {
       find_error();
       
       if (current_state == WALL_FOLLOW) {
-        follow_wall_mode();
+        follow_wall();
       }
   }
   tick++;

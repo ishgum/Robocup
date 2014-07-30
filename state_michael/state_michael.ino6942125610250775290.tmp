@@ -10,10 +10,7 @@
 
 
 #define DIGITAL_OUT_POWER 49
-#define FILTER_SIZE 10
-
-#define TRUE 0
-#define FALSE 1
+#define FILTER_SIZE 100
 
 struct Sensor {
   
@@ -22,7 +19,6 @@ struct Sensor {
   unsigned int index;
   unsigned int filterArray[FILTER_SIZE];
   unsigned int filteredRead;
-  unsigned int found;
 };
 
 
@@ -36,7 +32,6 @@ struct Sensor {
 #define CLOCKWISE 1
 #define ANTI_CLOCKWISE -1
 
-#define WALL_FOLLOW 0
 
 // Peripherals
 
@@ -58,10 +53,8 @@ int turning = CLOCKWISE;
 
 int state_on = 0;
 int state_off = 0;
-int on_state = OFF;
-int current_state = WALL_FOLLOW;
+int current_state = OFF;
 int action_state = STRAIGHT;
-int following_wall = 0;
 
 
 // Measurement variables
@@ -102,10 +95,6 @@ void setup() {
   infaLeft.index = 0;
   infaRight.index = 0;
   
-  infaFront.found = FALSE;
-  infaLeft.found = FALSE
-  infaRight.found = FALSE;
-  
   //Initialising magnet sensor
   delay(5);
   sixDOF.init(); //init the Acc and Gyro
@@ -124,20 +113,21 @@ void setup() {
 
 // Turning on and off
 void check_on (void) {
-  if (analogRead(ana_onoff) != 0 && on_state == OFF) {
+  if (analogRead(ana_onoff) != 0 && current_state == OFF) {
    state_off = 0;
    state_on += 1;
   }
-  if (analogRead(ana_onoff) == 0 && on_state == ON) {
+  if (analogRead(ana_onoff) == 0 && current_state == ON) {
    state_on = 0;
    state_off += 1;
   }
   
   if (state_on == 10) {
-    on_state = ON;
+    current_state = ON;
+    desiredAngle = angles[0];
   }
   if (state_off == 10) {
-    on_state = OFF;
+    current_state = OFF;
   }
 }
 
@@ -152,7 +142,6 @@ void stop_motors (void) {
 
 
 // Finds the error between the current angle and the desired
-
 void find_error (void) {
   sixDOF.getEuler(angles);
   error = desiredAngle - angles[0]; 
@@ -160,11 +149,9 @@ void find_error (void) {
 
 
 // If the robot drives up to a wall, stop and then determine which direction it should turn
-
 void find_Wall (void) {
 
     if (infaFront.filteredRead > 500) {
-      
       stop_motors();
       action_state = TURNING;
       if (infaLeft.filteredRead > 300) {
@@ -180,12 +167,17 @@ void find_Wall (void) {
 
 
 
-// Updates a single sensor using a MAF
 
 struct Sensor updateSensor (Sensor sensor) {
   sensor.currentRead = analogRead(sensor.port);
+  
+  
   sensor.filterArray[sensor.index] = sensor.currentRead;
+  
+  
   unsigned int temp_sum = 0;
+ 
+  
   for (int i = 0; i < FILTER_SIZE; i++)
   {
     temp_sum += sensor.filterArray[i];
@@ -206,72 +198,39 @@ void updateSensors (void) {
   infaLeft = updateSensor (infaLeft);
   infaRight = updateSensor (infaRight);
 }
-
-
-
-void determine_follow_wall(void) {
-  if (infaLeft.filteredRead > infaRight.filteredRead) {
-    following_wall = infaLeft.filteredRead;
-  }
-  else {
-    following_wall = infaRight.filteredRead;
-  }
-}
-
-
-void drive_straight (int desired_speed, int straight_error) {
-    
-    leftWheel.write(desired_speed + straight_error);
-    rightWheel.write(desired_speed - straight_error);
-}
-
-
-void follow_wall_mode (void) {
-  find_wall();
-  determine_follow_wall();
-  if (action_state == STRAIGHT) {
-    int straight_error = error + (following_wall - 400)/20;
-    drive_straight (140, straight_error);
-  }
-    
-  if (action_state == TURNING) {      
-    leftWheel.write((90 + turning*30));
-    rightWheel.write((90 - turning*30));
-    
-    if (abs(error) < 10) {
-        action_state = STRAIGHT;
-    }
-  } 
-}
   
-
-
-
-void random_search_mode (void) {
-  
-
-
-
 
 
 void loop() {
   
   check_on();
   
-  if (tick % 10 == 0) {
-  updateSensors();
-  }
-  
-  if (on_state == OFF) {
+  if (current_state == OFF) {
     stop_motors();
   }
   
-  if (on_state == ON) {
+  updateSensors();
+  
+  if (tick % 100 == 0) {
+  Serial.print("Left: "); Serial.print(infaLeft.filteredRead);
+  Serial.print("\t Right: "); Serial.print(infaRight.filteredRead);
+  Serial.print("\t Front: "); Serial.println(infaFront.filteredRead);
+  }
+  if (current_state == ON) {
       find_error();
+    if (action_state == STRAIGHT) {
+      leftWheel.write(140 + error*3);
+      rightWheel.write(140 - error*3);
+    }
+    
+    if (action_state == TURNING) {      
+      leftWheel.write((90 + turning*30));
+      rightWheel.write((90 - turning*30));
       
-      if (current_state == WALL_FOLLOW) {
-        follow_wall_mode();
+      if (abs(error) < 10) {
+          action_state = STRAIGHT;
       }
+    }
   }
   tick++;
 }
