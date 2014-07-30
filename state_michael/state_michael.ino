@@ -156,31 +156,13 @@ void find_Wall (void) {
 
 
 
-// Updates a single sensor using a MAF
 
-struct Sensor updateSensor (Sensor sensor) {
-  sensor.currentRead = analogRead(sensor.port);
-  sensor.filterArray[sensor.index] = sensor.currentRead;
-  unsigned int temp_sum = 0;
-  for (int i = 0; i < FILTER_SIZE; i++)
-  {
-    temp_sum += sensor.filterArray[i];
-  }
-  
-  sensor.filteredRead = temp_sum / FILTER_SIZE;
-  
-  sensor.index++;
-  if (sensor.index == (FILTER_SIZE)) {
-    sensor.index = 0;
-  }
-  return sensor;
-}
       
 
 void updateSensors (void) {
-  infaFront = updateSensor (infaFront);
-  infaLeft = updateSensor (infaLeft);
-  infaRight = updateSensor (infaRight);
+  infaFront.updateSensor();
+  infaLeft.updateSensor();
+  infaRight.updateSensor();
 }
 
 
@@ -223,7 +205,7 @@ void follow_wall_mode (void) {
 
 
 
-void random_search_mode (void) {
+//void random_search_mode (void) {
   
 
 
