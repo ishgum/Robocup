@@ -5,6 +5,7 @@
 #include <HMC5883L.h>
 
 #include "Sensors.h"
+#include "Motors.h"
 
 
 /**** SET UP ****/
@@ -29,8 +30,7 @@
 
 // Peripherals
 
-Servo leftWheel;  // create servo object to control a servo 
-Servo rightWheel;                 // a maximum of eight servo objects can be created 
+Motors motors;
 Servo sweep;
 
 
@@ -79,8 +79,6 @@ unsigned long tick = 0;
   
 void setup() {
   Serial.begin(9600);
-  leftWheel.attach(12);  // S11 (on port S6)
-  rightWheel.attach(13);  // S12 (on port S6)
  
   //Initialising magnet sensor
   delay(5);
@@ -118,15 +116,6 @@ void check_on (void) {
 }
 
 
-
-// Sends a zero reading to both motors
-void stop_motors (void) {
-    leftWheel.write(90);
-    rightWheel.write(90);
-}
-
-
-
 // Finds the error between the current angle and the desired
 
 void find_error (void) {
@@ -141,7 +130,7 @@ void find_Wall (void) {
 
     if (infaFront.filteredRead > 500) {
       
-      stop_motors();
+      motors.fullStop();
       action_state = TURNING;
       if (infaLeft.filteredRead > 300) {
         turning = CLOCKWISE;
@@ -177,19 +166,12 @@ void determine_follow_wall(void) {
 }
 
 
-void drive_straight (int desired_speed, int straight_error) {
-    
-    leftWheel.write(desired_speed + straight_error);
-    rightWheel.write(desired_speed - straight_error);
-}
-
-
 void follow_wall_mode (void) {
-  find_wall();
+  find_Wall();
   determine_follow_wall();
   if (action_state == STRAIGHT) {
     int straight_error = error + (following_wall - 400)/20;
-    drive_straight (140, straight_error);
+    motors.driveStraight(50, error, FORWARDS);
   }
     
   if (action_state == TURNING) {      
