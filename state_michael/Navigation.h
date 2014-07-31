@@ -1,6 +1,6 @@
 
-#ifndef Motors_h
-#define Motors_h
+#ifndef Navigation_h
+#define Navigation_h
 
 #include "Arduino.h"
 #include <Servo.h>
@@ -11,17 +11,15 @@
 #define FORWARDS 1
 #define BACKWARDS -1
 
-#define CLOCKWISE 1
-#define ANTI_CLOCKWISE -1
 
 
-class Motors
+
+class Navigation
 {
 	public:
-		Motors (void);
+		Navigation (void);
                 void fullStop (void);
-		void drive (signed int error, signed int speedPercent, signed int dir);
-                void turn (unsigned int speedPercent, signed int dir);
+		void driveStraight (signed int error, signed int speedPercent, signed int dir);
 	private:
 		Servo leftWheel;
                 Servo rightWheel;

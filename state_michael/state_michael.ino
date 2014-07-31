@@ -6,15 +6,13 @@
 
 #include "Sensors.h"
 #include "Motors.h"
+#include "Navigation.h"
 
 
 /**** SET UP ****/
 
 
 #define DIGITAL_OUT_POWER 49
-#define FILTER_SIZE 10
-
-
 
 // State defines
 
@@ -22,9 +20,6 @@
 #define OFF 0
 #define STRAIGHT 0
 #define TURNING 1
-
-#define CLOCKWISE 1
-#define ANTI_CLOCKWISE -1
 
 #define WALL_FOLLOW 0
 
@@ -43,7 +38,7 @@ int ana_onoff = 3; // analogue input pin
 
 // State things
 
-int turning = CLOCKWISE;
+int turning_dir = CLOCKWISE;
 
 int state_on = 0;
 int state_off = 0;
@@ -94,6 +89,18 @@ void setup() {
 }
 
 
+void updateOnState (int stateChange) {
+  if (stateChange == ON) {
+    currentState = ON;
+  if (stateChange == OFF) {
+    currentState = OFF;
+  }
+  
+void updateActionState (int stateChange) {
+  if (currentState == ON) {
+    if (stateChange == STRAIGHT) {
+      actionState
+
 
 
 // Turning on and off
@@ -124,28 +131,21 @@ void find_error (void) {
 }
 
 
-// If the robot drives up to a wall, stop and then determine which direction it should turn
 
-void find_Wall (void) {
-
-    if (infaFront.filteredRead > 500) {
-      
-      motors.fullStop();
-      action_state = TURNING;
-      if (infaLeft.filteredRead > 300) {
-        turning = CLOCKWISE;
-        desiredAngle += 90;
-      }
-      else if (infaRight.filteredRead > 300) {
-        turning = ANTI_CLOCKWISE;
-        desiredAngle -= 90;
-      }
+void navigateCorner (void) {
+  if (infaFront.found == true) {
+    motors.fullStop();
+    updateState(TURNING);
+    if (infaLeft.found == true) {
+      turning_dir = CLOCKWISE;
+      desiredAngle += 90;
     }
+    else if (infaRight.filteredRead > 300) {
+    turning_dir = ANTI_CLOCKWISE;
+    desiredAngle -= 90;
+    }
+  }
 }
-
-
-
-
       
 
 void updateSensors (void) {
@@ -171,12 +171,10 @@ void follow_wall_mode (void) {
   determine_follow_wall();
   if (action_state == STRAIGHT) {
     int straight_error = error + (following_wall - 400)/20;
-    motors.driveStraight(50, error, FORWARDS);
+    motors.drive(error, 50, FORWARDS);
   }
-    
   if (action_state == TURNING) {      
-    leftWheel.write((90 + turning*30));
-    rightWheel.write((90 - turning*30));
+    motors.turn(50, turning_dir);
     
     if (abs(error) < 10) {
         action_state = STRAIGHT;
@@ -203,7 +201,7 @@ void loop() {
   }
   
   if (on_state == OFF) {
-    stop_motors();
+    motors.fullStop();
   }
   
   if (on_state == ON) {
