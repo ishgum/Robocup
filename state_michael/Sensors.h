@@ -11,6 +11,8 @@ class Sensors
 	public:
 		Sensors (int port);
 		void updateSensor();
+                void findWall (unsigned int recognitionDistance);
+
 		int filteredRead;
 		int found;
 	private:

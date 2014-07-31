@@ -1,6 +1,6 @@
 
-#ifndef Motors_h
-#define Motors_h
+#ifndef PID_h
+#define PID_h
 
 #include "Arduino.h"
 #include <Servo.h>
@@ -15,10 +15,10 @@
 #define ANTI_CLOCKWISE -1
 
 
-class Motors
+class PID
 {
 	public:
-		Motors (void);
+		PID (void);
                 void fullStop (void);
 		void drive (signed int error, signed int speedPercent, signed int dir);
                 void turn (unsigned int speedPercent, signed int dir);
