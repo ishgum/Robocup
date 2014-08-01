@@ -7,21 +7,15 @@
 #include "Sensors.h"
 #include "Motors.h"
 #include "Navigation.h"
+#include "State.h"
+#include "PID.h"
+#include "Compass.h"
 
 
 /**** SET UP ****/
 
 
 #define DIGITAL_OUT_POWER 49
-
-// State defines
-
-#define ON 1
-#define OFF 0
-#define STRAIGHT 0
-#define TURNING 1
-
-#define WALL_FOLLOW 0
 
 // Peripherals
 
@@ -42,22 +36,8 @@ int turning_dir = CLOCKWISE;
 
 int state_on = 0;
 int state_off = 0;
-int on_state = OFF;
-int current_state = WALL_FOLLOW;
-int action_state = STRAIGHT;
 int following_wall = 0;
 
-
-// Measurement variables
-
-int desiredAngle = 0;
-int error = 0;
-
-// Magnometer stuff
-
-float angles[3];
-FreeSixIMU sixDOF = FreeSixIMU();
-HMC5883L compass;
 
   
 // RTOS
@@ -65,9 +45,10 @@ HMC5883L compass;
 unsigned long tick = 0;
   
   
-  
-  
-  
+Compass compass;
+State state;
+PID angularError; 
+
  /**** Program ****/
   
   
@@ -75,59 +56,31 @@ unsigned long tick = 0;
 void setup() {
   Serial.begin(9600);
  
-  //Initialising magnet sensor
-  delay(5);
-  sixDOF.init(); //init the Acc and Gyro
-  delay(5);
-  compass = HMC5883L(); // init HMC5883
-  compass.SetMeasurementMode(Measurement_Continuous);
-  sixDOF.getEuler(angles);
- 
-  float desiredAngle = angles[0];
+
+  compass.desiredValue = compass.findAngle();
   
 
 }
 
 
-void updateOnState (int stateChange) {
-  if (stateChange == ON) {
-    currentState = ON;
-  if (stateChange == OFF) {
-    currentState = OFF;
-  }
   
-void updateActionState (int stateChange) {
-  if (currentState == ON) {
-    if (stateChange == STRAIGHT) {
-      actionState
-
-
-
 // Turning on and off
 void check_on (void) {
-  if (analogRead(ana_onoff) != 0 && on_state == OFF) {
+  if (analogRead(ana_onoff) != 0 && state.powerState == OFF) {
    state_off = 0;
    state_on += 1;
   }
-  if (analogRead(ana_onoff) == 0 && on_state == ON) {
+  if (analogRead(ana_onoff) == 0 && state.powerState == ON) {
    state_on = 0;
    state_off += 1;
   }
   
   if (state_on == 10) {
-    on_state = ON;
+    state.powerState = ON;
   }
   if (state_off == 10) {
-    on_state = OFF;
+    state.powerState = OFF;
   }
-}
-
-
-// Finds the error between the current angle and the desired
-
-void find_error (void) {
-  sixDOF.getEuler(angles);
-  error = desiredAngle - angles[0]; 
 }
 
 
@@ -135,14 +88,14 @@ void find_error (void) {
 void navigateCorner (void) {
   if (infaFront.found == true) {
     motors.fullStop();
-    updateState(TURNING);
+    state.updateDriveState(TURNING);
     if (infaLeft.found == true) {
       turning_dir = CLOCKWISE;
-      desiredAngle += 90;
+      angularError.desiredValue += 90;
     }
     else if (infaRight.filteredRead > 300) {
     turning_dir = ANTI_CLOCKWISE;
-    desiredAngle -= 90;
+    angularError.desiredValue -= 90;
     }
   }
 }
@@ -167,17 +120,17 @@ void determine_follow_wall(void) {
 
 
 void follow_wall_mode (void) {
-  find_Wall();
+  infaFront.findWall(500);
   determine_follow_wall();
-  if (action_state == STRAIGHT) {
-    int straight_error = error + (following_wall - 400)/20;
-    motors.drive(error, 50, FORWARDS);
+  if (state.driveState == STRAIGHT) {
+    int straight_error = angularError.error + (following_wall - 400)/20;
+    motors.drive(angularError.error, 50, FORWARDS);
   }
-  if (action_state == TURNING) {      
+  if (state.driveState == TURNING) {      
     motors.turn(50, turning_dir);
     
-    if (abs(error) < 10) {
-        action_state = STRAIGHT;
+    if (abs(angularError.error) < 10) {
+        state.driveState = STRAIGHT;
     }
   } 
 }
@@ -200,14 +153,14 @@ void loop() {
   updateSensors();
   }
   
-  if (on_state == OFF) {
+  if (state.powerState == OFF) {
     motors.fullStop();
   }
   
-  if (on_state == ON) {
-      find_error();
+  if (state.powerState == ON) {
+      angularError.findError(compass.findAngle());
       
-      if (current_state == WALL_FOLLOW) {
+      if (state.navigationState == WALL_FOLLOW) {
         follow_wall_mode();
       }
   }
