@@ -1,5 +1,4 @@
 
-#include "Arduino.h"
 #include "PID.h"
 
 PID::PID(void)

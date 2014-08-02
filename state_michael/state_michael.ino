@@ -1,5 +1,6 @@
-#include <Servo.h> 
 
+
+#include <Servo.h> 
 #include <Wire.h>
 #include <FreeSixIMU.h>
 #include <HMC5883L.h>
@@ -9,7 +10,7 @@
 #include "Navigation.h"
 #include "State.h"
 #include "PID.h"
-#include "Compass.h"
+#include "Magno.h"
 #include "Switch.h"
 
 
@@ -28,7 +29,7 @@
   Sensors infaLeft(0);
   Sensors infaRight(1);
 
-  Compass compass;
+  Magno compass;
   State state;
   PID angularError;
   PID wallError;

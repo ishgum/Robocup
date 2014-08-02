@@ -1,17 +1,16 @@
 
-#ifndef Compass_h
-#define Compass_h
+#ifndef Magno_h
+#define Magno_h
 
 #include "Arduino.h"
 
-#include <Wire.h>
 #include <FreeSixIMU.h>
 #include <HMC5883L.h>
 
-class Compass
+class Magno
 {
 	public:
-		Compass (void);
+		Magno (void);
                 float findAngle(void);
                 
                 float desiredValue;

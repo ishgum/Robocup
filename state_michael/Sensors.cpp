@@ -1,5 +1,4 @@
 
-#include "Arduino.h"
 #include "Sensors.h"
 
 Sensors::Sensors(int port)

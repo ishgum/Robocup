@@ -1,5 +1,4 @@
 
-#include "Arduino.h"
 #include "Switch.h"
 
 Switch::Switch(int port)

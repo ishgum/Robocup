@@ -1,6 +1,5 @@
 
-#include "Arduino.h"
-#include "Compass.h"
+#include "Magno.h"
 
 #include <Wire.h>
 #include <FreeSixIMU.h>
@@ -8,7 +7,7 @@
 
 
 
-Compass::Compass(void)
+Magno::Magno(void)
 {
   float angles[3];
   FreeSixIMU sixDOF = FreeSixIMU();
@@ -25,7 +24,7 @@ Compass::Compass(void)
 }
 
 
-float Compass::findAngle(void)
+float Magno::findAngle(void)
 {
   sixDOF.getEuler(angles);
   return angles[0];
