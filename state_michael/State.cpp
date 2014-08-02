@@ -7,6 +7,7 @@ State::State(void)
   int powerState = OFF;
   int navigationState = WALL_FOLLOW;
   int driveState = STOPPED;
+  int followStateState = RIGHT_WALL;
 }
 
 
@@ -49,5 +50,16 @@ void State::updateDriveState (int changeState) {
   }
   if (changeState == OFF) {
     driveState = STOPPED;
+  }
+}
+
+
+
+void State::updateFollowState (int changeState) {
+  if (changeState == RIGHT_WALL) {
+   navigationState = RIGHT_WALL;
+  }
+  if (changeState == LEFT_WALL) {
+    navigationState = LEFT_WALL;
   }
 }

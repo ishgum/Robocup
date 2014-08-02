@@ -28,15 +28,15 @@
     <BootSegment>0</BootSegment>
     <AsfFrameworkConfig>
       <framework-data>
-  <options />
-  <configurations />
-  <files />
-  <documentation help="" />
-  <offline-documentation help="" />
-  <dependencies>
-    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.6.0" />
-  </dependencies>
-</framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.6.0" />
+        </dependencies>
+      </framework-data>
     </AsfFrameworkConfig>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -350,10 +350,40 @@ build.arch=AVR
     <Folder Include="Visual Micro\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compass.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Compass.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Motors.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Motors.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Navigation.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Navigation.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="PID.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="PID.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Sensors.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Sensors.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="State.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="State.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Visual Micro\.state_michael.vsarduino.h">

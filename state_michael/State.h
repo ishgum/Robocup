@@ -18,6 +18,8 @@
 #define WALL_FOLLOW 0
 #define SEARCHING 1
 
+#define RIGHT_WALL 0
+#define LEFT_WALL 1
 
 
 
@@ -28,10 +30,12 @@ class State
                 void updatePowerState (int changeState);
                 void updateNavigationState (int changeState);
                 void updateDriveState (int changeState);
+                void updateFollowState (int changeState);
                 
                 int powerState;
                 int navigationState;
                 int driveState;
+                int followState;
 	private:
 	
 	

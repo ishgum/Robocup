@@ -18,17 +18,24 @@ extern "C" void __cxa_pure_virtual() {;}
 
 //
 void check_on (void);
-void stop_motors (void);
-void find_error (void);
-void find_Wall (void);
+void navigateCorner (void);
 void updateSensors (void);
 void determine_follow_wall(void);
-void drive_straight (int desired_speed, int straight_error);
 void follow_wall_mode (void);
 //
 
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\variants\mega\pins_arduino.h" 
 #include "C:\Program Files (x86)\Arduino\hardware\arduino\cores\arduino\arduino.h"
 #include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\state_michael.ino"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Compass.cpp"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Compass.h"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Motors.cpp"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Motors.h"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Navigation.cpp"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Navigation.h"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\PID.cpp"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\PID.h"
 #include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Sensors.cpp"
 #include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\Sensors.h"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\State.cpp"
+#include "C:\Users\Michael\Documents\Arduino\Robocup\state_michael\State.h"

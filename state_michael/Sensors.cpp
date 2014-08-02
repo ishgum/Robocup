@@ -36,12 +36,14 @@ void Sensors::updateSensor () {
 
 // If the robot drives up to a wall, stop and then determine which direction it should turn
 
-void Sensors::findWall (unsigned int recognitionDistance) {
+int Sensors::findWall (unsigned int recognitionDistance) {
     if (filteredRead >= recognitionDistance) {
       found = true;
     }
     else if (filteredRead < recognitionDistance) {
       found = false;
     }
+    
+    return found;
 }
 
