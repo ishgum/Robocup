@@ -3,12 +3,11 @@
 
 Sensors::Sensors(int port)
 {
-  int _port = port;
-  int _currentRead= 0;
-  int _index = 0;
-  int _filterArray[FILTER_SIZE] = {0};
-  int filteredRead = 0;
-  int found = false;
+  _port = port;
+  _currentRead= 0;
+  _index = 0;
+  filteredRead = 0;
+  found = false;
 }
 
 
@@ -44,5 +43,11 @@ int Sensors::findWall (unsigned int recognitionDistance) {
     }
     
     return found;
+}
+
+
+
+int Sensors::returnPort() {
+  return _port;
 }
 

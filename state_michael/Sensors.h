@@ -12,6 +12,8 @@ class Sensors
 		Sensors (int port);
 		void updateSensor();
                 int findWall (unsigned int recognitionDistance);
+                int returnPort();
+
 		int filteredRead;
 		int found;
 	private:
