@@ -22,9 +22,11 @@ class Motors
                 void fullStop (void);
 		void drive (signed int error, signed int speedPercent, signed int dir);
                 void turn (unsigned int speedPercent, signed int dir);
+                
+                int leftValue;
+                int rightValue;
 	private:
-		Servo leftWheel;
-                Servo rightWheel;
+		
 	
     
 };

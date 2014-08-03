@@ -10,7 +10,7 @@
 #include "Navigation.h"
 #include "State.h"
 #include "PID.h"
-#include "Magno.h"
+//#include "Magno.h"
 #include "Switch.h"
 
 
@@ -23,13 +23,15 @@
 
   Motors motors;
   Servo sweep;
+  Servo leftWheel;
+  Servo rightWheel;
   
   
   Sensors infaFront(4);
   Sensors infaLeft(0);
   Sensors infaRight(1);
 
-  Magno compass;
+//  Magno compass;
   State state;
   PID angularError;
   PID wallError;
@@ -55,7 +57,10 @@ unsigned long tick = 0;
 void setup() {
   Serial.begin(9600);
   Serial.println("Got here");
-  compass.desiredValue = compass.findAngle();
+//  compass.desiredValue = compass.findAngle();
+
+  leftWheel.attach(12);  // S11 (on port S6)
+  rightWheel.attach(13); // S12 (on port S6)
 
   wallError.desiredValue = 400;
 }
@@ -87,7 +92,7 @@ void updateSensors (void) {
 // Updates the error for the angle as well as for the wall following
 
 void updateErrors (void) {
-  angularError.findError(compass.findAngle());
+//  angularError.findError(compass.findAngle());
   if (state.followState == RIGHT_WALL) {
     wallError.findError(infaRight.filteredRead);
   }
@@ -160,21 +165,22 @@ void followWallState (void) {
 void loop() {
   
   checkPowerSwitch();
-  
+  Serial.println(state.powerState);
   if (state.powerState == ON) {
     
-    if (tick % 10 == 0) {
-    updateSensors();
-    updateErrors();
-    }
-    
-    if (tick % 1000 == 0) {
-      updateState();
-      
-      if (state.navigationState == WALL_FOLLOW) {
-        followWallState();
-      }
-    }
+    motors.drive(0, 20, FORWARDS);
+//    if (tick % 10 == 0) {
+//    updateSensors();
+//    updateErrors();
+//    }
+//    
+//    if (tick % 1000 == 0) {
+//      updateState();
+//      
+//      if (state.navigationState == WALL_FOLLOW) {
+//        followWallState();
+//      }
+//    }
   }
   
   if (state.powerState == OFF) {
