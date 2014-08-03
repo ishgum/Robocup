@@ -10,7 +10,7 @@
 #include "Navigation.h"
 #include "State.h"
 #include "PID.h"
-//#include "Magno.h"
+#include "Magno.h"
 #include "Switch.h"
 
 
@@ -18,6 +18,7 @@
 
 
 #define DIGITAL_OUT_POWER 49
+
 
 // Peripherals
 
@@ -31,7 +32,7 @@
   Sensors infaLeft(0);
   Sensors infaRight(1);
 
-//  Magno compass;
+  Magno compass;
   State state;
   PID angularError;
   PID wallError;
@@ -57,7 +58,16 @@ unsigned long tick = 0;
 void setup() {
   Serial.begin(9600);
   Serial.println("Got here");
-//  compass.desiredValue = compass.findAngle();
+  
+  pinMode(DIGITAL_OUT_POWER, OUTPUT); 
+  digitalWrite(DIGITAL_OUT_POWER, 1);
+  
+  //Magnometer
+  
+  compass.init();
+  
+  
+  compass.desiredValue = compass.findAngle();
 
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
@@ -92,7 +102,7 @@ void updateSensors (void) {
 // Updates the error for the angle as well as for the wall following
 
 void updateErrors (void) {
-//  angularError.findError(compass.findAngle());
+  angularError.findError(compass.findAngle());
   if (state.followState == RIGHT_WALL) {
     wallError.findError(infaRight.filteredRead);
   }
