@@ -3,29 +3,29 @@
 
 Switch::Switch(int port)
 {
-  int _port = port;
-  int _onCount = 0;
-  int _offCount = 0;
-  int switchState = false;
+  _port = port;
+  _onCount = 0;
+  _offCount = 0;
+  switchState = SWITCH_OFF;
 }
 
 
 // Updates a single sensor using a MAF
 
 void Switch::updateSwitch () {
-   if (analogRead(_port) != LOW) {
+   if (analogRead(_port) != 0) {
      _offCount = 0;
      _onCount += 1;
   }
-  if (analogRead(_port) == LOW) {
+  if (analogRead(_port) == 0) {
      _onCount = 0;
      _offCount += 1;
   }
   
   if (_onCount == ON_BUFFER) {
-    switchState = true;
+    switchState = SWITCH_ON;
   }
   if (_offCount == OFF_BUFFER) {
-    switchState = false;
+    switchState = SWITCH_OFF;
   }
 }

@@ -3,8 +3,6 @@
 
 Motors::Motors(void)
 {
-  Servo leftWheel;
-  Servo rightWheel;
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
 }

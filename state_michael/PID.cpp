@@ -3,8 +3,8 @@
 
 PID::PID(void)
 {
-  float desiredValue = 0;
-  float error = 0;
+  desiredValue = 0;
+  error = 0;
 }
 
 

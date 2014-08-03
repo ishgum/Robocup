@@ -9,9 +9,9 @@
 
 Magno::Magno(void)
 {
-  float angles[3];
-  FreeSixIMU sixDOF = FreeSixIMU();
-  HMC5883L compass;
+  sixDOF = FreeSixIMU();
+  Serial.begin(9600);
+  Serial.println("Got here");
   
     //Initialising magnet sensor
   delay(5);

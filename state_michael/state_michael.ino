@@ -54,6 +54,7 @@ unsigned long tick = 0;
   
 void setup() {
   Serial.begin(9600);
+  Serial.println("Got here");
   compass.desiredValue = compass.findAngle();
 
   wallError.desiredValue = 400;

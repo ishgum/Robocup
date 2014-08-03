@@ -7,6 +7,8 @@
 #define ON_BUFFER 20
 #define OFF_BUFFER 10
 
+#define SWITCH_OFF 0
+#define SWITCH_ON 1
 
 class Switch
 {

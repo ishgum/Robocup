@@ -3,10 +3,10 @@
 
 State::State(void)
 {
-  int powerState = OFF;
-  int navigationState = WALL_FOLLOW;
-  int driveState = STOPPED;
-  int followStateState = RIGHT_WALL;
+  powerState = OFF;
+  navigationState = WALL_FOLLOW;
+  driveState = STOPPED;
+  followState = RIGHT_WALL;
 }
 
 
