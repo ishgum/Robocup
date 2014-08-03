@@ -7,7 +7,7 @@ Sensors::Sensors(int port)
   _currentRead= 0;
   _index = 0;
   filteredRead = 0;
-  found = false;
+  found = 0;
 }
 
 
@@ -36,10 +36,10 @@ void Sensors::updateSensor () {
 
 int Sensors::findWall (unsigned int recognitionDistance) {
     if (filteredRead >= recognitionDistance) {
-      found = true;
+      found = 1;
     }
     else if (filteredRead < recognitionDistance) {
-      found = false;
+      found = 0;
     }
     
     return found;

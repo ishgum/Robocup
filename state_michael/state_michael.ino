@@ -106,7 +106,16 @@ void updateErrors (void) {
 // Facilitates transitions between states
 
 void updateState(void) {
+  if (state.powerState == OFF) {
+    state.driveState = STOPPED;
+  }
+  
+  if (state.driveState == STOPPED && state.powerState == ON) {
+      state.driveState = STRAIGHT;
+    }
+    
   if (state.navigationState == WALL_FOLLOW) {
+    
     if (state.driveState == STRAIGHT && infaFront.findWall(500)) {
       motors.fullStop();
       state.updateDriveState(TURNING);
@@ -118,9 +127,9 @@ void updateState(void) {
         angularError.desiredValue += 90;
       }
     }
-    else if (state.driveState == TURNING && abs(angularError.error) < 5) {
-      state.updateDriveState(STRAIGHT);
-    }
+//    else if (state.driveState == TURNING && abs(angularError.error) < 5) {
+//      state.updateDriveState(STRAIGHT);
+//    }
   }
 }
 
@@ -165,27 +174,31 @@ void followWallState (void) {
 void loop() {
   
   checkPowerSwitch();
-  Serial.println(state.powerState);
+  Serial.print(state.powerState); Serial.print("\t Drive State: "); Serial.print(state.driveState);
+  Serial.print("\t Front sensor: ");Serial.println(infaFront.filteredRead);
+ 
+  updateState();
+  
   if (state.powerState == ON) {
     
-    motors.drive(0, 20, FORWARDS);
-//    if (tick % 10 == 0) {
-//    updateSensors();
-//    updateErrors();
-//    }
-//    
-//    if (tick % 1000 == 0) {
-//      updateState();
-//      
-//      if (state.navigationState == WALL_FOLLOW) {
-//        followWallState();
-//      }
-//    }
+    if (tick % 10 == 0) {
+    updateSensors();
+    updateErrors();
+    }
+    
+    if (tick % 10 == 0) {      
+      if (state.navigationState == WALL_FOLLOW) {
+        followWallState();
+      }
+    }
   }
   
   if (state.powerState == OFF) {
     motors.fullStop();
   }
+  
+  leftWheel.write(motors.leftValue);
+  rightWheel.write(motors.rightValue);
   tick++;
 }
 
