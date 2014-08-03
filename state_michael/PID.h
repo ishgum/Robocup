@@ -12,6 +12,8 @@ class PID
                 float findError (float currentValue);
                 float error;
                 float desiredValue;
+                float desiredSweep;
+                int sweepDirection;
 	private:
 		
 	
