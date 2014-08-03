@@ -6,6 +6,7 @@
 #define CONV 250000 // for 1 clock tick every 4us (250kHz clock)
 
 volatile int count = 0;
+int pulses = 0;
 int lastTime = 0;
 int time = 0;
 int deltaTime = 0;
@@ -28,11 +29,12 @@ void loop()
 {
   noInterrupts(); //critical section
   time = TCNT1;
+  pulses = count; //???
   interrupts();
   deltaTime = time - lastTime; //time difference between last poll
   if(deltaTime > 0) //-ve if overflow and no NaN
   {
-    freq = (count*CONV)/deltaTime; //calc frequency
+    freq = (pulses*CONV)/deltaTime; //calc frequency
   }
   lastTime = time; //<-- fuck up if dt = 0;
   //Serial.print(count-lastCount);
