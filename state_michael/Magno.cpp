@@ -23,6 +23,8 @@ void Magno::init() {
   compass = HMC5883L(); // init HMC5883
   compass.SetMeasurementMode(Measurement_Continuous);
   sixDOF.getEuler(angles);
+  
+  getHeading();
 }
 
 

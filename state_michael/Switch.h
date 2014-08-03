@@ -9,6 +9,7 @@
 
 #define SWITCH_OFF 0
 #define SWITCH_ON 1
+#define WAITING 2
 
 class Switch
 {

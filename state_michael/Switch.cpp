@@ -25,7 +25,10 @@ void Switch::updateSwitch () {
   if (_onCount == ON_BUFFER) {
     switchState = SWITCH_ON;
   }
-  if (_offCount == OFF_BUFFER) {
+  else if (_offCount == OFF_BUFFER) {
     switchState = SWITCH_OFF;
+  }
+  else {
+    switchState = WAITING;
   }
 }
