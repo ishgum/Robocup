@@ -22,7 +22,8 @@
 // Peripherals
 
   Motors motors;
-  Servo sweep;
+  Servo servoLeft;
+  Servo servoRight;
   Servo leftWheel;
   Servo rightWheel;
   
@@ -68,6 +69,8 @@ void setup() {
   
   compass.desiredValue = compass.findAngle();
 
+  servoLeft.attach(0);
+  servoRight.attach(1);
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
 
@@ -169,13 +172,32 @@ void followWallState (void) {
     }
   
 }
-  
+
+ 
 
 
 
 void randomSearchMode (void) {
   if (state.driveState == STRAIGHT) {
+    if (tick % 100) { 
+      if (angularError.sweepState == 0) {
+        angularError.desiredSweep += 1;
+        servoLeft.write(angularError.desiredSweep * 2);
+        servoRight.write(angularError.desiredSweep * 2);
+      }
+      if (angularError.sweepState == 1) {
+        angularError.desiredSweep -= 1;
+      }
   }
+  if (angularError.desiredSweep >= 45) {
+    angularError.sweepState = 1;
+  }
+  if (angularError.desiredSweep <= -45) {
+    angularError.sweepState = 0;
+  }
+  servosSweep();
+  followWallState();
+    
 }
     
     
@@ -196,16 +218,18 @@ void loop() {
     
     motors.drive(0, 70, FORWARDS);
     
-//    if (tick % 10 == 0) {
-//    updateSensors();
-//    updateErrors();
-//    }
-//    
-//    if (tick % 10 == 0) {      
-//      if (state.navigationState == WALL_FOLLOW) {
-//        followWallState();
-//      }
-//    }
+    if (tick % 10 == 0) {
+    updateSensors();
+    updateErrors();
+    }
+    
+    if (tick % 10 == 0) {      
+      if (state.navigationState == WALL_FOLLOW) {
+        followWallState();
+      }
+      if (state.navigationState == SEARCHING) {
+        randomSearchMode();
+    }
   }
   
   if (state.powerState == OFF) {
