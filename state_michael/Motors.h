@@ -26,7 +26,10 @@ class Motors
                 int leftValue;
                 int rightValue;
 	private:
-		
+		int _zero;
+                int _fullSpeed;
+                
+                
 	
     
 };

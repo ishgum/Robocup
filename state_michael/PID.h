@@ -10,6 +10,7 @@ class PID
 	public:
 		PID (void);
                 float findError (float currentValue);
+                void changeDesired();
                 float error;
                 float desiredValue;
                 float desiredSweep;

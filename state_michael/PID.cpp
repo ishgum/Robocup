@@ -15,3 +15,10 @@ PID::PID(void)
 float PID::findError (float currentValue) {
   error = (desiredValue + desiredSweep) - currentValue;
 }
+
+
+void PID::changeDesired() {
+  Serial.println(desiredValue);
+  desiredValue = desiredValue + 90;
+  Serial.println(desiredValue);
+}

@@ -17,6 +17,7 @@ class Magno
                 
                 float desiredValue;
                 float heading;
+                float currentAngle;
 	private:
                 float angles[3];
                 FreeSixIMU sixDOF;

@@ -11,6 +11,7 @@ Magno::Magno(void)
 {
   Wire.begin();
   sixDOF = FreeSixIMU();
+  currentAngle = 0;
 
 }
 
@@ -59,6 +60,7 @@ void Magno::getHeading(){
 float Magno::findAngle(void)
 {
   sixDOF.getEuler(angles);
+  delay(5);
   getHeading();
-  return angles[0];
+  currentAngle = angles[0];
 }
