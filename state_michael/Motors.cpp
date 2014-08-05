@@ -8,8 +8,6 @@ Motors::Motors(void)
 }
 
 
-// Updates a single sensor using a MAF
-
 void Motors::fullStop (void) {
   leftValue = ZERO_VALUE;
   rightValue = ZERO_VALUE;
