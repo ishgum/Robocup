@@ -26,6 +26,8 @@ void Magno::init() {
   sixDOF.getEuler(angles);
   
   getHeading();
+  
+  currentAngle = angles[0];
 }
 
 
@@ -57,7 +59,7 @@ void Magno::getHeading(){
 }
 
 
-float Magno::findAngle(void)
+void Magno::findAngle(void)
 {
   sixDOF.getEuler(angles);
   delay(5);

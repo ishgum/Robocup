@@ -11,7 +11,7 @@ class Magno
 {
 	public:
 		Magno (void);
-                float findAngle(void);
+                void findAngle(void);
                 void getHeading(void);
                 void init(void);
                 

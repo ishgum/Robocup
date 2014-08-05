@@ -17,8 +17,8 @@ float PID::findError (float currentValue) {
 }
 
 
-void PID::changeDesired() {
-  Serial.println(desiredValue);
-  desiredValue = desiredValue + 90;
-  Serial.println(desiredValue);
+void PID::changeDesired(float change) {
+  //Serial.println(desiredValue);
+  desiredValue = desiredValue + change;
+  //Serial.println(desiredValue);
 }

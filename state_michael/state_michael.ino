@@ -67,7 +67,7 @@ void setup() {
   compass.init();
   
   
-  compass.desiredValue = compass.findAngle();
+  compass.desiredValue = compass.currentAngle;
 
   servoLeft.attach(0);
   servoRight.attach(1);
@@ -84,6 +84,8 @@ void checkPowerSwitch() {
   powerSwitch.updateSwitch();
   if (powerSwitch.switchState == SWITCH_ON) {
     state.updatePowerState(ON);
+    compass.findAngle();
+    angularError.desiredValue = compass.currentAngle;
   }
   if (powerSwitch.switchState == SWITCH_OFF) {
     state.updatePowerState(OFF);
@@ -144,12 +146,12 @@ void determine_follow_wall(void) {
 
 void driveRobot (void) {
   if (state.driveState == STRAIGHT) {
-    float straightError = angularError.error + wallError.error/20;
+    float straightError = angularError.error + wallError.error/10;
     motors.drive(straightError, 50, FORWARDS);
   }
   
   if (state.driveState == TURNING) {      
-    motors.turn(30, turning_dir);
+    motors.turn(40, turning_dir);
   } 
 }
 
@@ -163,10 +165,10 @@ void followWallState (void) {
       state.updateDriveState(TURNING);
       
       if (state.followState == RIGHT_WALL) {
-        angularError.changeDesired();
+        angularError.changeDesired(-90);
       }
       if (state.followState == LEFT_WALL) {
-        angularError.changeDesired();
+        angularError.changeDesired(90);
       }
     }
   else if (state.driveState == TURNING && abs(angularError.error) < 5) {
@@ -223,7 +225,7 @@ void loop() {
   updateSensors();
   updateErrors();
     
-    if (tick % 500 == 0) {
+    if (tick % 50 == 0) {
       compass.findAngle();
       //Serial.println(angularError.error);
     }
