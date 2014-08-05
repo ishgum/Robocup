@@ -18,7 +18,7 @@
 #define WALL_FOLLOW 0
 #define SEARCHING 1
 
-#define RIGHT_WALL -1
+#define RIGHT_WALL 0
 #define LEFT_WALL 1
 
 

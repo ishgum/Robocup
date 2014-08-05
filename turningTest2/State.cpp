@@ -56,9 +56,9 @@ void State::updateDriveState (int changeState) {
 
 void State::updateFollowState (int changeState) {
   if (changeState == RIGHT_WALL) {
-   followState = RIGHT_WALL;
+   navigationState = RIGHT_WALL;
   }
   if (changeState == LEFT_WALL) {
-    followState = LEFT_WALL;
+    navigationState = LEFT_WALL;
   }
 }

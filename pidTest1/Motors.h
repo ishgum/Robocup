@@ -11,7 +11,8 @@
 #define FORWARDS 1
 #define BACKWARDS -1
 
-
+#define CLOCKWISE 1
+#define ANTI_CLOCKWISE -1
 
 
 class Motors
@@ -25,7 +26,6 @@ class Motors
                 int leftValue;
                 int rightValue;
 	private:
-                void checkClipping();
 		int _zero;
                 int _fullSpeed;
                 

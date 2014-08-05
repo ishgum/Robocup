@@ -16,38 +16,23 @@ void Motors::fullStop (void) {
 }
 
 
-void Motors::checkClipping (void) {
-  if (leftValue >= (ZERO_VALUE + FULL_SPEED)) {
-    leftValue = ZERO_VALUE + FULL_SPEED;
-  }
-  if (leftValue <= (ZERO_VALUE - FULL_SPEED)) {
-    leftValue = ZERO_VALUE - FULL_SPEED;
-  }
-  if (rightValue >= (ZERO_VALUE + FULL_SPEED)) {
-    rightValue = ZERO_VALUE + FULL_SPEED;
-  }
-  if (rightValue <= (ZERO_VALUE - FULL_SPEED)) {
-    leftValue = ZERO_VALUE - FULL_SPEED;
-  }
-}
-
-
-
 void Motors::drive (signed int error, signed int speedPercent, signed int dir) {
   unsigned int speedMotors = (FULL_SPEED*speedPercent)/100;
+  if (speedMotors > FULL_SPEED) {
+    speedMotors = FULL_SPEED;
+  }
+  int desiredDir = dir;
   
   leftValue = (ZERO_VALUE + dir*(speedMotors + error));
   rightValue = (ZERO_VALUE + dir*(speedMotors - error));
-  
-  checkClipping();
 }
 
 
 void Motors::turn (unsigned int speedPercent, signed int dir) {
   unsigned int speedMotors = (FULL_SPEED*speedPercent)/100;
-  
+  if (speedMotors > FULL_SPEED) {
+    speedMotors = FULL_SPEED;
+  }
   leftValue = (ZERO_VALUE + dir*speedMotors);
   rightValue = (ZERO_VALUE - dir*speedMotors);
-  
-  checkClipping();
 }

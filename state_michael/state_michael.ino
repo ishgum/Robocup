@@ -19,11 +19,13 @@
 #define DIGITAL_OUT_POWER 49
 
 
+#define SENSOR_MIDDLE 105
+#define SENSOR_ANGLE 30
+
 // Peripherals
 
   Motors motors;
-  Servo servoLeft;
-  Servo servoRight;
+  Servo frontSensor;
   Servo leftWheel;
   Servo rightWheel;
   
@@ -32,17 +34,13 @@
   Sensors infaLeft(0);
   Sensors infaRight(1);
 
-  Magno compass;
+  //Magno compass;
   State state;
   PID angularError;
   PID wallError;
   Switch powerSwitch(3);
 
 // State things
-
-int turning_dir = CLOCKWISE;
-
-int following_wall = 0;
 
 
   
@@ -64,17 +62,16 @@ void setup() {
   
   //Magnometer
   
-  compass.init();
+  //compass.init();
   
   
-  compass.desiredValue = compass.currentAngle;
+  //compass.desiredValue = compass.currentAngle;
 
-  servoLeft.attach(0);
-  servoRight.attach(1);
+  frontSensor.attach(10);
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
 
-  wallError.desiredValue = 400;
+  wallError.setDesiredValue(400);
 }
 
 
@@ -84,11 +81,15 @@ void checkPowerSwitch() {
   powerSwitch.updateSwitch();
   if (powerSwitch.switchState == SWITCH_ON) {
     state.updatePowerState(ON);
-    compass.findAngle();
-    angularError.desiredValue = compass.currentAngle;
+    state.updateDriveState(STRAIGHT);
+    determineWallFollow();
+    //compass.findAngle();
+    //angularError.desiredValue = compass.currentAngle;
   }
   if (powerSwitch.switchState == SWITCH_OFF) {
+     state.updateDriveState(STOPPED);
     state.updatePowerState(OFF);
+    frontSensor.write(SENSOR_MIDDLE);
   }
 }
 
@@ -106,7 +107,7 @@ void updateSensors (void) {
 // Updates the error for the angle as well as for the wall following
 
 void updateErrors (void) {
-  angularError.findError(compass.currentAngle);
+  //angularError.findError(compass.currentAngle);
   if (state.followState == RIGHT_WALL) {
     wallError.findError(infaRight.filteredRead);
   }
@@ -119,25 +120,17 @@ void updateErrors (void) {
 
 // Facilitates transitions between states
 
-void updateState(void) {
-  if (state.powerState == OFF) {
-    state.driveState = STOPPED;
-  }
-  
-  if (state.driveState == STOPPED && state.powerState == ON) {
-      state.driveState = STRAIGHT;
-    }
-}
 
 
 
 
-void determine_follow_wall(void) {
+void determineWallFollow(void) {
+  updateSensors();
   if (infaLeft.filteredRead > infaRight.filteredRead) {
-    following_wall = infaLeft.filteredRead;
+    state.followState = LEFT_WALL;
   }
   else {
-    following_wall = infaRight.filteredRead;
+    state.followState = RIGHT_WALL;
   }
 }
 
@@ -146,12 +139,12 @@ void determine_follow_wall(void) {
 
 void driveRobot (void) {
   if (state.driveState == STRAIGHT) {
-    float straightError = angularError.error + wallError.error/10;
-    motors.drive(straightError, 50, FORWARDS);
+    float straightError = -state.followState * wallError.error/13;
+    motors.drive(straightError, 70, FORWARDS);
   }
   
   if (state.driveState == TURNING) {      
-    motors.turn(40, turning_dir);
+    motors.turn(70, state.followState);
   } 
 }
 
@@ -160,18 +153,15 @@ void driveRobot (void) {
 
 
 void followWallState (void) {
-   if (state.driveState == STRAIGHT && infaFront.findWall(450)) {
+   if (state.driveState == STRAIGHT && infaFront.findWall(500)) {
       motors.fullStop();
       state.updateDriveState(TURNING);
-      
-      if (state.followState == RIGHT_WALL) {
-        angularError.changeDesired(-90);
-      }
-      if (state.followState == LEFT_WALL) {
-        angularError.changeDesired(90);
-      }
+      int sensorTurnAngle = SENSOR_MIDDLE + state.followState*SENSOR_ANGLE;
+      frontSensor.write(sensorTurnAngle);
     }
-  else if (state.driveState == TURNING && abs(angularError.error) < 5) {
+  else if (state.driveState == TURNING && !infaFront.findWall(300)) {
+    
+    frontSensor.write(SENSOR_MIDDLE);
     state.updateDriveState(STRAIGHT);
   }
   
@@ -183,22 +173,19 @@ void followWallState (void) {
 
 void randomSearchMode (void) {
   if (state.driveState == STRAIGHT) {
-    if (tick % 100) { 
-      if (angularError.sweepDirection == 0) {
-        angularError.desiredSweep += 1;
-        servoLeft.write(angularError.desiredSweep * 2);
-        servoRight.write(angularError.desiredSweep * 2);
-      }
-      if (angularError.sweepDirection == 1) {
-        angularError.desiredSweep -= 1;
-      }
-  }
-  if (angularError.desiredSweep >= 45) {
-    angularError.sweepDirection = 1;
-  }
-  if (angularError.desiredSweep <= -45) {
-    angularError.sweepDirection = 0;
-  }
+//    if (tick % 100) { 
+//      if (angularError.sweepDirection == 0) {
+//      }
+//      if (angularError.sweepDirection == 1) {
+//        angularError.desiredSweep -= 1;
+//      }
+//  }
+//  if (angularError.desiredSweep >= 45) {
+//    angularError.sweepDirection = 1;
+//  }
+//  if (angularError.desiredSweep <= -45) {
+//    angularError.sweepDirection = 0;
+//  }
   //servosSweep();
   followWallState();
     
@@ -214,9 +201,6 @@ void randomSearchMode (void) {
 void loop() {
   
   checkPowerSwitch();
- 
- 
-  updateState();
   
   if (state.powerState == ON) {
     
@@ -225,10 +209,10 @@ void loop() {
   updateSensors();
   updateErrors();
     
-    if (tick % 50 == 0) {
-      compass.findAngle();
-      //Serial.println(angularError.error);
-    }
+//    if (tick % 50 == 0) {
+//      compass.findAngle();
+//      //Serial.println(angularError.error);
+//    }
     
     if (tick % 10 == 0) {      
       if (state.navigationState == WALL_FOLLOW) {
