@@ -173,7 +173,10 @@ void followWallState (void) {
 
 void randomSearchMode (void) {
   if (state.driveState == STRAIGHT) {
-//    if (tick % 100) { 
+    if (tick % 100) { 
+      
+      
+      
 //      if (angularError.sweepDirection == 0) {
 //      }
 //      if (angularError.sweepDirection == 1) {
@@ -185,7 +188,7 @@ void randomSearchMode (void) {
 //  }
 //  if (angularError.desiredSweep <= -45) {
 //    angularError.sweepDirection = 0;
-//  }
+  }
   //servosSweep();
   followWallState();
     
