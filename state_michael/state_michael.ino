@@ -24,12 +24,16 @@
 #define SENSOR_MIDDLE 105
 #define SENSOR_ANGLE 30
 
+#define TOO_CLOSE 0
+#define FAR_AWAY 1
+
 // Peripherals
 
   Motors motors;
   Servo frontSensor;
   Servo leftWheel;
   Servo rightWheel;
+  Servo detectorArm;
   
   
   Sensors infaFront(4);
@@ -47,6 +51,9 @@
 // State things
 
 int motorSpeed = 50;
+int pos = 0;
+int waveDirection = 1;
+int wall = FAR_AWAY;
   
 // RTOS
 
@@ -72,10 +79,11 @@ void setup() {
   //compass.desiredValue = compass.currentAngle;
 
   frontSensor.attach(10);
+  detectorArm.attach(11);
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
 
-  wallError.setDesiredValue(350);
+  
   
   colourView.init();
   colourView.setHome();
@@ -112,7 +120,7 @@ void checkColour(void) {
     state.updateNavigationState(EVACUATE);
   }
   if (colourView.area == ARENA) {
-    motorSpeed = 80;
+    motorSpeed = 60;
   }
   if (colourView.area == HOME) {
     motorSpeed = 50;
@@ -136,7 +144,7 @@ void updateSensors (void) {
 
 // Updates the error for the angle as well as for the wall following
 
-void updateErrors (void) {
+void updateWallError (void) {
   //angularError.findError(compass.currentAngle);
   determineWallFollow();
   
@@ -213,25 +221,20 @@ void followWallState (void) {
 
 
 
-void randomSearchMode (void) {
-  if (state.driveState == STRAIGHT) {
-//    if (tick % 100) { 
-//      if (angularError.sweepDirection == 0) {
-//      }
-//      if (angularError.sweepDirection == 1) {
-//        angularError.desiredSweep -= 1;
-//      }
-//  }
-//  if (angularError.desiredSweep >= 45) {
-//    angularError.sweepDirection = 1;
-//  }
-//  if (angularError.desiredSweep <= -45) {
-//    angularError.sweepDirection = 0;
-//  }
-  //servosSweep();
-  followWallState();
-    
-}
+void avoidWallState (void) {
+      followWallState ();
+      if (wallError.error < 400) {
+        wallError.error = wallError.error;
+      }
+      if (wallError.error > 400) {
+        wallError.error = 0;
+      }
+      //if (wall == TOO_CLOSE) {
+      //  wallError.error = wallError.error;
+      //}
+      //if (wall == FAR_AWAY) {
+      //  wallError.error = 0;
+      //}
 }
 
 
@@ -241,17 +244,33 @@ void leaveEnemyBase (void) {
     motors.drive(straightError, motorSpeed, BACKWARDS);
   }
   else {
-    if (state.followState = RIGHT_WALL) {
-    state.followState = LEFT_WALL;
-    }
-    else {
-      state.followState = RIGHT_WALL;
+    switch (state.followState) {
+      case RIGHT_WALL:
+        state.followState = LEFT_WALL;
+        break;
+      
+      case LEFT_WALL:   
+       state.followState = RIGHT_WALL;
     } 
     state.navigationState = WALL_FOLLOW;
   }
     
 }
     
+    
+    
+void waveArm(void){
+  detectorArm.write(pos);
+  if (tick % 2 == 0) {
+    pos = pos + waveDirection;
+  }
+  if (pos >= 140) {
+    waveDirection = -1;
+  }
+  if (pos <= 40) {
+    waveDirection = 1;
+  }
+}
     
 
 
@@ -262,40 +281,43 @@ void loop() {
   
   checkPowerSwitch();
   
-  if (state.powerState == ON) {
-    
-    //motors.drive(0, 70, FORWARDS);
-    
-  updateSensors();
-  updateErrors();
-  checkColour();
-    
-    if (tick % 200 == 0) {
-//      compass.findAngle();
-        colourView.findColour();
-      //Serial.print(motors.leftValue); Serial.print("\t");
-      //Serial.println(state.navigationState);
-    }
-    
-    if (tick % 10 == 0) {      
-      if (state.navigationState == WALL_FOLLOW) {
-        followWallState();
-        driveRobotForwards();
+  switch (state.powerState) {
+    case ON:
+      updateSensors();
+      checkColour();
+        
+      if (tick % 200 == 0) {
+  //      compass.findAngle();
+          colourView.findColour();
       }
-      if (state.navigationState == SEARCHING) {
-        randomSearchMode();
-      }
-      if (state.navigationState == EVACUATE) {
-        motors.fullStop();
-        //delay(1000);
-        //colourView.setHome();
-        //leaveEnemyBase();
-      }
-    }
-  }
+      
+      switch (state.navigationState) {
+        case WALL_FOLLOW: 
+          wallError.setDesiredValue(350);
+          updateWallError();
+          followWallState();
+          driveRobotForwards();
+          break;
+
+        case SEARCHING: 
+          wallError.setDesiredValue(300);
+          updateWallError();
+          avoidWallState();
+          Serial.println(wallError.error);
+          waveArm();
+          driveRobotForwards();
+          
+        case EVACUATE:
+          state.updateNavigationState(SEARCHING);
+          //motors.fullStop();
+          //leaveEnemyBase();
+          break;
+        }
+        break;
   
-  if (state.powerState == OFF) {
+  case OFF:
     motors.fullStop();
+    break;
   }
   
   leftWheel.write(motors.leftValue);
