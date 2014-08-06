@@ -6,7 +6,7 @@
 #include <avr/interrupt.h>
 
 #define CONV 250000 //for 1 clock tick every 4us (250kHz clock)
-#define DETECT_THRESHOLD 14500
+#define DETECT_THRESHOLD 6500
 
 volatile unsigned int count = 27;
 unsigned int pulses = 27;
@@ -37,8 +37,7 @@ void loop()
   pulses = count; //???
   interrupts();
   deltaTime = time - lastTime; //time difference between last poll
-  if(deltaTime < 60000) //-ve if overflow and no NaN
-  {
+  if(deltaTime < 60000){ //-ve if overflow and no NaN
     freq = (pulses*CONV)/deltaTime; //calc frequency
   }
   count = 0; //reset count
@@ -50,6 +49,9 @@ void loop()
   if (freq < DETECT_THRESHOLD) 
   {
     object = true;    
+  }
+  else{
+   object = false; 
   }
 }
 
