@@ -11,6 +11,13 @@
 #define greenpin 5
 #define bluepin 6
 
+#define BLACK 400
+#define TOLERANCE 50
+#define MAX_COLOUR 1000
+
+#define ARENA 0
+#define HOME 1
+#define ENEMY 2
 
 #define commonAnode true
 
@@ -21,10 +28,14 @@ class ColourSense
 		ColourSense (void);
                 void findColour(void);
                 void init(void);
+                void detectBase (void);
+                void setHome (void);
                 
                 uint16_t colour, red, green, blue;
+                int area;
 	private:
                 Adafruit_TCS34725 tcs;
+                int homeColour;
 };
 
 #endif

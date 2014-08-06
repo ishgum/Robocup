@@ -17,6 +17,7 @@
 
 #define WALL_FOLLOW 0
 #define SEARCHING 1
+#define EVACUATE 2
 
 #define RIGHT_WALL -1
 #define LEFT_WALL 1

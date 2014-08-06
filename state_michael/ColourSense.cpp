@@ -34,4 +34,24 @@ void ColourSense::findColour(void)
   tcs.getRawData(&red, &green, &blue, &colour);
 
   tcs.setInterrupt(true);  // turn off LED
+  
+}
+
+
+void ColourSense::detectBase(void) {
+  if (colour < BLACK) {
+    area = ARENA;
+  }
+  else if (colour < (homeColour + TOLERANCE) && colour > (homeColour - TOLERANCE)) {
+    area = HOME;
+  }
+  else if (colour < MAX_COLOUR) {
+    area = ENEMY;
+  }
+}
+
+
+void ColourSense::setHome(void) {
+  findColour();
+  homeColour = colour;
 }

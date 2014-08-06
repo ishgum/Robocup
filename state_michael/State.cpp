@@ -30,6 +30,9 @@ void State::updateNavigationState (int changeState) {
     if (changeState == SEARCHING) {
       navigationState = SEARCHING;
     }
+    if (changeState == EVACUATE) {
+      navigationState = EVACUATE;
+    }
   }
 }
 

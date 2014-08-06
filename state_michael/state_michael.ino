@@ -46,7 +46,7 @@
 
 // State things
 
-
+int motorSpeed = 50;
   
 // RTOS
 
@@ -75,9 +75,10 @@ void setup() {
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
 
-  wallError.setDesiredValue(400);
+  wallError.setDesiredValue(350);
   
   colourView.init();
+  colourView.setHome();
 }
 
 
@@ -88,7 +89,11 @@ void checkPowerSwitch() {
   if (powerSwitch.switchState == SWITCH_ON) {
     state.updatePowerState(ON);
     state.updateDriveState(STRAIGHT);
+    updateSensors();
     determineWallFollow();
+    
+    
+    colourView.setHome();
     //compass.findAngle();
     //angularError.desiredValue = compass.currentAngle;
   }
@@ -98,6 +103,25 @@ void checkPowerSwitch() {
     frontSensor.write(SENSOR_MIDDLE);
   }
 }
+
+
+
+void checkColour(void) {
+  colourView.detectBase();
+  if (colourView.area == ENEMY) {
+    state.updateNavigationState(EVACUATE);
+  }
+  if (colourView.area == ARENA) {
+    motorSpeed = 80;
+  }
+  if (colourView.area == HOME) {
+    motorSpeed = 50;
+    state.updateNavigationState(WALL_FOLLOW);
+  }
+}
+
+
+
 
 
 
@@ -114,6 +138,8 @@ void updateSensors (void) {
 
 void updateErrors (void) {
   //angularError.findError(compass.currentAngle);
+  determineWallFollow();
+  
   if (state.followState == RIGHT_WALL) {
     wallError.findError(infaRight.filteredRead);
   }
@@ -131,7 +157,6 @@ void updateErrors (void) {
 
 
 void determineWallFollow(void) {
-  updateSensors();
   if (infaLeft.filteredRead > infaRight.filteredRead) {
     state.followState = LEFT_WALL;
   }
@@ -143,10 +168,10 @@ void determineWallFollow(void) {
 
 
 
-void driveRobot (void) {
+void driveRobotBackwards (void) {
   if (state.driveState == STRAIGHT) {
-    float straightError = -state.followState * wallError.error/13;
-    motors.drive(straightError, 70, FORWARDS);
+    float straightError = state.followState * wallError.error/13;
+    motors.drive(straightError, motorSpeed, BACKWARDS);
   }
   
   if (state.driveState == TURNING) {      
@@ -154,6 +179,17 @@ void driveRobot (void) {
   } 
 }
 
+
+void driveRobotForwards (void) {
+  if (state.driveState == STRAIGHT) {
+    float straightError = -state.followState * wallError.error/13;
+    motors.drive(straightError, motorSpeed, FORWARDS);
+  }
+  
+  if (state.driveState == TURNING) {      
+    motors.turn(70, state.followState);
+  } 
+}
 
 
 
@@ -197,6 +233,24 @@ void randomSearchMode (void) {
     
 }
 }
+
+
+void leaveEnemyBase (void) {
+  if (infaFront.findWall(200)) {
+    float straightError = state.followState * wallError.error/10;
+    motors.drive(straightError, motorSpeed, BACKWARDS);
+  }
+  else {
+    if (state.followState = RIGHT_WALL) {
+    state.followState = LEFT_WALL;
+    }
+    else {
+      state.followState = RIGHT_WALL;
+    } 
+    state.navigationState = WALL_FOLLOW;
+  }
+    
+}
     
     
 
@@ -214,21 +268,29 @@ void loop() {
     
   updateSensors();
   updateErrors();
+  checkColour();
     
-    if (tick % 50 == 0) {
+    if (tick % 200 == 0) {
 //      compass.findAngle();
         colourView.findColour();
-      //Serial.println(angularError.error);
+      //Serial.print(motors.leftValue); Serial.print("\t");
+      //Serial.println(state.navigationState);
     }
     
     if (tick % 10 == 0) {      
       if (state.navigationState == WALL_FOLLOW) {
         followWallState();
+        driveRobotForwards();
       }
       if (state.navigationState == SEARCHING) {
         randomSearchMode();
       }
-      driveRobot();
+      if (state.navigationState == EVACUATE) {
+        motors.fullStop();
+        //delay(1000);
+        //colourView.setHome();
+        //leaveEnemyBase();
+      }
     }
   }
   
