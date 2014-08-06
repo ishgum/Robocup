@@ -36,6 +36,8 @@
   Servo rightWheel;
   Servo detectorArm;
   
+  Whisker whisker;
+  
   
   Sensors infaFront(4);
   Sensors infaLeft(0);
@@ -97,6 +99,10 @@ void setup() {
   TCNT1=0x0000; //16bit counter register initialised to 0
 }
 
+void WISR(void)
+{
+    whisker.count++;
+}
 
 // Checks the state of the on switch, if the switch is on the power is supplied to the robot
 
@@ -326,6 +332,10 @@ void loop() {
   case OFF:
     motors.fullStop();
     break;
+  }
+  
+  if(whisker.detect()){
+    motors.fullStop();
   }
   
   leftWheel.write(motors.leftValue);
