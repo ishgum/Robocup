@@ -8,10 +8,12 @@ Whisker::Whisker(void){
 	deltaTime = 0;
 	freq = 0;
 	object = false;
+        _foundCount = 0;
+        _weightFound = false;
 }
 
 
-bool Whisker::detect (void){
+bool Whisker::updateDetector (void){
   cli(); //critical section
   time = TCNT1;
   pulses = count; 
@@ -22,9 +24,9 @@ bool Whisker::detect (void){
   }
   count = 0; //reset count
   lastTime = time;
-  Serial.print(freq);
-  Serial.print("\t");
-  Serial.println(object);
+  //Serial.print(freq);
+  //Serial.print("\t");
+  //Serial.println(object);
   if (freq < DETECT_THRESHOLD){
     object = true;    
   }
@@ -34,6 +36,16 @@ bool Whisker::detect (void){
   return object;
 }
 
-//void Whisker::WISR(void){
-//    count++;
-//}
+bool Whisker::findWeight (void) {
+  if(updateDetector()){
+    _foundCount++;
+  }
+  if(!updateDetector()){
+    _foundCount = 0;
+    _weightFound = false;
+  }
+  if (_foundCount > TOLERANCE) {
+    _weightFound = true;
+  }
+  return _weightFound;
+}

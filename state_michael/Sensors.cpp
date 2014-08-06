@@ -6,6 +6,7 @@ Sensors::Sensors(int port)
   _port = port;
   _currentRead= 0;
   _index = 0;
+  setOff = false;
   filteredRead = 0;
   found = 0;
 }

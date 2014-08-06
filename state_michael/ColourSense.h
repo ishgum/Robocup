@@ -12,7 +12,7 @@
 #define bluepin 6
 
 #define BLACK 400
-#define TOLERANCE 50
+#define TOLERANCE 100
 #define MAX_COLOUR 1000
 
 #define ARENA 0

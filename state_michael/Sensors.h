@@ -14,6 +14,7 @@ class Sensors
                 int findWall (unsigned int recognitionDistance);
 		int filteredRead;
 		int found;
+                bool setOff;
 	private:
 		int _port;
 		int _currentRead;
