@@ -36,6 +36,7 @@
   Servo rightWheel;
   Servo detectorArm;
   
+  
   Whisker whisker;
   
   
@@ -271,19 +272,21 @@ void leaveEnemyBase (void) {
     
 }
     
-    
-    
-void waveArm(void){
-  detectorArm.write(pos);
-  if (tick % 2 == 0) {
-    pos = pos + waveDirection;
-  }
-  if (pos >= 140) {
-    waveDirection = -1;
-  }
-  if (pos <= 40) {
-    waveDirection = 1;
-  }
+
+bool waving = true;
+void waveArm(bool waving){
+  detectorArm.write(pos); 
+ if(waving){ 
+    if (tick % 2 == 0) {
+      pos = pos + waveDirection;
+    }
+    if (pos >= 130) {
+      waveDirection = -1;
+    }
+    if (pos <= 50) {
+      waveDirection = 1;
+    }
+ }
 }
     
 
@@ -318,7 +321,7 @@ void loop() {
           updateWallError();
           avoidWallState();
           Serial.println(wallError.error);
-          waveArm();
+          waveArm(waving);
           driveRobotForwards();
           
         case EVACUATE:
@@ -336,6 +339,10 @@ void loop() {
   
   if(whisker.detect()){
     motors.fullStop();
+    waving = false;
+  }
+  if(!whisker.detect()){
+    waving = true;
   }
   
   leftWheel.write(motors.leftValue);
