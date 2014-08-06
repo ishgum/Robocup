@@ -14,6 +14,7 @@
 #include "Switch.h"
 #include "ColourSense.h"
 #include "Whisker.h"
+#include "WaveArm.h"
 
 
 /**** SET UP ****/
@@ -27,6 +28,9 @@
 
 #define TOO_CLOSE 0
 #define FAR_AWAY 1
+
+#define FRONT 0
+#define SIDE 1
 
 // Peripherals
 
@@ -51,13 +55,12 @@
   Switch powerSwitch(3);
   
   ColourSense colourView;
+  
+  WaveArm detector;
 
 // State things
 
-int motorSpeed = 50;
-int pos = 0;
-int waveDirection = 1;
-int wall = FAR_AWAY;
+int setOff = FRONT;
   
 // RTOS
 
@@ -74,20 +77,11 @@ void setup() {
   
   pinMode(DIGITAL_OUT_POWER, OUTPUT); 
   digitalWrite(DIGITAL_OUT_POWER, 1);
-  
-  //Magnometer
-  
-  //compass.init();
-  
-  
-  //compass.desiredValue = compass.currentAngle;
 
   frontSensor.attach(10);
   detectorArm.attach(11);
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
-
-  
   
   colourView.init();
   colourView.setHome();
@@ -98,6 +92,11 @@ void setup() {
   TCCR1A = 0x00; //normal operation mode
   TCCR1B = 0x03; //64x prescale for 250kHz clock
   TCNT1=0x0000; //16bit counter register initialised to 0
+  
+  //Magnometer
+  //compass.init();
+  //compass.desiredValue = compass.currentAngle;
+  
 }
 
 void WISR(void)
@@ -105,25 +104,35 @@ void WISR(void)
     whisker.count++;
 }
 
+
+
+void resetRobot(void) {
+  state.updateDriveState(STRAIGHT);
+  updateSensors();
+  determineWallFollow();
+  colourView.setHome();
+  frontSensor.write(SENSOR_MIDDLE);
+}
+
+
 // Checks the state of the on switch, if the switch is on the power is supplied to the robot
 
 void checkPowerSwitch() {
   powerSwitch.updateSwitch();
-  if (powerSwitch.switchState == SWITCH_ON) {
+  
+  switch (powerSwitch.switchState) {
+    case SWITCH_ON:
     state.updatePowerState(ON);
-    state.updateDriveState(STRAIGHT);
-    updateSensors();
-    determineWallFollow();
+    resetRobot();
     
-    
-    colourView.setHome();
     //compass.findAngle();
     //angularError.desiredValue = compass.currentAngle;
-  }
-  if (powerSwitch.switchState == SWITCH_OFF) {
-     state.updateDriveState(STOPPED);
+    
+    break;
+  case SWITCH_OFF:
+    state.updateDriveState(STOPPED);
     state.updatePowerState(OFF);
-    frontSensor.write(SENSOR_MIDDLE);
+    break;
   }
 }
 
@@ -135,11 +144,10 @@ void checkColour(void) {
     state.updateNavigationState(EVACUATE);
   }
   if (colourView.area == ARENA) {
-    motorSpeed = 60;
+    motors.setMotorSpeed(70);
   }
   if (colourView.area == HOME) {
-    motorSpeed = 50;
-    state.updateNavigationState(WALL_FOLLOW);
+    motors.setMotorSpeed(50);
   }
 }
 
@@ -161,52 +169,22 @@ void updateSensors (void) {
 
 void updateWallError (void) {
   //angularError.findError(compass.currentAngle);
-  determineWallFollow();
   
-  if (state.followState == RIGHT_WALL) {
+  if (infaLeft.filteredRead <= infaRight.filteredRead) {
+    state.followState = RIGHT_WALL;
     wallError.findError(infaRight.filteredRead);
   }
-  if (state.followState == LEFT_WALL) {
+  if (infaLeft.filteredRead > infaRight.filteredRead) {
+    state.followState = RIGHT_WALL;
     wallError.findError(infaLeft.filteredRead);
   }
 }
 
 
-
-// Facilitates transitions between states
-
-
-
-
-
-void determineWallFollow(void) {
-  if (infaLeft.filteredRead > infaRight.filteredRead) {
-    state.followState = LEFT_WALL;
-  }
-  else {
-    state.followState = RIGHT_WALL;
-  }
-}
-
-
-
-
-void driveRobotBackwards (void) {
+void driveRobot (int driveDirection) {
   if (state.driveState == STRAIGHT) {
-    float straightError = state.followState * wallError.error/13;
-    motors.drive(straightError, motorSpeed, BACKWARDS);
-  }
-  
-  if (state.driveState == TURNING) {      
-    motors.turn(70, state.followState);
-  } 
-}
-
-
-void driveRobotForwards (void) {
-  if (state.driveState == STRAIGHT) {
-    float straightError = -state.followState * wallError.error/13;
-    motors.drive(straightError, motorSpeed, FORWARDS);
+    float straightError = -driveDirection * state.followState * wallError.error/13;
+    motors.drive(straightError, motors.motorSpeed, driveDirection);
   }
   
   if (state.driveState == TURNING) {      
@@ -217,14 +195,15 @@ void driveRobotForwards (void) {
 
 
 
-void followWallState (void) {
+void navigateCorner (void) {
    if (state.driveState == STRAIGHT && infaFront.findWall(500)) {
       motors.fullStop();
       state.updateDriveState(TURNING);
       int sensorTurnAngle = SENSOR_MIDDLE + state.followState*SENSOR_ANGLE;
       frontSensor.write(sensorTurnAngle);
+      setOff = FRONT;
     }
-  else if (state.driveState == TURNING && !infaFront.findWall(300)) {
+  else if (state.driveState == TURNING && !infaFront.findWall(300) && setOff == FRONT) {
     
     frontSensor.write(SENSOR_MIDDLE);
     state.updateDriveState(STRAIGHT);
@@ -237,56 +216,25 @@ void followWallState (void) {
 
 
 void avoidWallState (void) {
-      followWallState ();
-      if (wallError.error < 400) {
-        wallError.error = wallError.error;
+    followWallState ();
+    if (state.driveState == STRAIGHT && (infaLeft.findWall(400) || infaRight.findWall(400))) {
+      motors.fullStop();
+      state.updateDriveState(TURNING);
+      setOff = SIDE;
+    }
+    else if (state.driveState == TURNING && !(infaLeft.findWall(200) || infaRight.findWall(200)) && setOff == SIDE) {
+        state.updateDriveState(STRAIGHT);
       }
-      if (wallError.error > 400) {
-        wallError.error = 0;
-      }
-      //if (wall == TOO_CLOSE) {
-      //  wallError.error = wallError.error;
-      //}
-      //if (wall == FAR_AWAY) {
-      //  wallError.error = 0;
-      //}
+    wallError.error = 0;
 }
 
-
-void leaveEnemyBase (void) {
-  if (infaFront.findWall(200)) {
-    float straightError = state.followState * wallError.error/10;
-    motors.drive(straightError, motorSpeed, BACKWARDS);
-  }
-  else {
-    switch (state.followState) {
-      case RIGHT_WALL:
-        state.followState = LEFT_WALL;
-        break;
-      
-      case LEFT_WALL:   
-       state.followState = RIGHT_WALL;
-    } 
-    state.navigationState = WALL_FOLLOW;
-  }
     
-}
-    
-
-bool waving = true;
-void waveArm(bool waving){
-  detectorArm.write(pos); 
- if(waving){ 
-    if (tick % 2 == 0) {
-      pos = pos + waveDirection;
-    }
-    if (pos >= 130) {
-      waveDirection = -1;
-    }
-    if (pos <= 50) {
-      waveDirection = 1;
-    }
- }
+  
+void waveArm(void){
+  detectorArm.write(detector.currentAngle); 
+    if (tick % 10 == 0) {
+      detector.armPos();
+   }
 }
     
 
@@ -309,20 +257,20 @@ void loop() {
       }
       
       switch (state.navigationState) {
+        
+        updateWallError();
+        driveRobotForwards();
+        
         case WALL_FOLLOW: 
           wallError.setDesiredValue(350);
-          updateWallError();
-          followWallState();
-          driveRobotForwards();
+          navigateCorner();
           break;
 
         case SEARCHING: 
           wallError.setDesiredValue(300);
-          updateWallError();
           avoidWallState();
-          Serial.println(wallError.error);
-          waveArm(waving);
-          driveRobotForwards();
+          waveArm();
+          break;
           
         case EVACUATE:
           state.updateNavigationState(SEARCHING);
@@ -337,18 +285,13 @@ void loop() {
     break;
   }
   
-  if(whisker.detect()){
-    motors.fullStop();
-    waving = false;
-  }
-  if(!whisker.detect()){
-    waving = true;
-  }
+  Serial.println(whisker.found);
   
-  leftWheel.write(motors.leftValue);
-  rightWheel.write(motors.rightValue);
+  //leftWheel.write(motors.leftValue);
+  //rightWheel.write(motors.rightValue);
   tick++;
 }
+
 
 
 

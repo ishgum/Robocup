@@ -18,7 +18,7 @@ class Whisker
 		bool object;
 		volatile unsigned int count;
 	private:
-		unsigned int pulses = 27;
+		unsigned int pulses;
 		unsigned int lastTime = 0;
 		unsigned int time = 0;
 		unsigned int deltaTime = 0;
