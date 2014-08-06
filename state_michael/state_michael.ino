@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <FreeSixIMU.h>
 #include <HMC5883L.h>
+#include "Adafruit_TCS34725.h"
 
 #include "Sensors.h"
 #include "Motors.h"
@@ -11,6 +12,7 @@
 #include "PID.h"
 #include "Magno.h"
 #include "Switch.h"
+#include "ColourSense.h"
 
 
 /**** SET UP ****/
@@ -39,6 +41,8 @@
   PID angularError;
   PID wallError;
   Switch powerSwitch(3);
+  
+  ColourSense colourView;
 
 // State things
 
@@ -72,6 +76,8 @@ void setup() {
   rightWheel.attach(13); // S12 (on port S6)
 
   wallError.setDesiredValue(400);
+  
+  colourView.init();
 }
 
 
@@ -209,10 +215,11 @@ void loop() {
   updateSensors();
   updateErrors();
     
-//    if (tick % 50 == 0) {
+    if (tick % 50 == 0) {
 //      compass.findAngle();
-//      //Serial.println(angularError.error);
-//    }
+        colourView.findColour();
+      //Serial.println(angularError.error);
+    }
     
     if (tick % 10 == 0) {      
       if (state.navigationState == WALL_FOLLOW) {

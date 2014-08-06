@@ -3,7 +3,7 @@ enum PinAssignments
   IntPin = 2
 };
 
-unsigned long IntCount=0;
+volatile unsigned long IntCount=0;
 
 
 void setup() 
