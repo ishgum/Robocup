@@ -13,6 +13,7 @@
 #include "Magno.h"
 #include "Switch.h"
 #include "ColourSense.h"
+#include "Whisker.h"
 
 
 /**** SET UP ****/
@@ -87,6 +88,13 @@ void setup() {
   
   colourView.init();
   colourView.setHome();
+  
+  //WHISKER STUFF
+  attachInterrupt(0, WISR, FALLING); //enable interrupt0 (pin2)
+  pinMode(2, INPUT);
+  TCCR1A = 0x00; //normal operation mode
+  TCCR1B = 0x03; //64x prescale for 250kHz clock
+  TCNT1=0x0000; //16bit counter register initialised to 0
 }
 
 
