@@ -5,7 +5,6 @@ Motors::Motors(void)
 {
   leftValue = 0;
   rightValue = 0;
-  motorSpeed = 50;
 }
 
 
@@ -50,14 +49,3 @@ void Motors::turn (unsigned int speedPercent, signed int dir) {
   
   checkClipping();
 }
-
-
-void Motors::setMotorSpeed(unsigned int newSpeed) {
-  if (newSpeed > 0 && newSpeed < 100) {
-    motorSpeed = newSpeed;
-  }
-}
-
-
-
-
