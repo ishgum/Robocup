@@ -34,3 +34,8 @@ bool Whisker::detect (void)
   }
   return object;
 {
+
+void Whisker::WISR(void)
+{
+    count++;
+}

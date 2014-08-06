@@ -15,6 +15,7 @@ class Whisker
 		bool detect(void);
 		bool object;
 	private:
+		void WISR(void);
 		volatile unsigned int count;
 		unsigned int pulses = 27;
 		unsigned int lastTime = 0;
