@@ -6,6 +6,7 @@
 #include <avr/interrupt.h>
 
 #define CONV 250000 //for 1 clock tick every 4us (250kHz clock)
+#define DETECT_THRESHOLD 14500
 
 volatile unsigned int count = 27;
 unsigned int pulses = 27;
@@ -13,11 +14,12 @@ unsigned int lastTime = 0;
 unsigned int time = 0;
 unsigned int deltaTime = 0;
 unsigned long freq = 0;
+bool object = false;
 
 void setup()
 {
   Serial.begin(9600);
-  attachInterrupt(0, WISR, RISING); //enable interrupt0 (pin2)
+  attachInterrupt(0, WISR, FALLING); //enable interrupt0 (pin2)
   pinMode(2, INPUT);
   //cli(); //disable glob interrupts
   TCCR1A = 0x00; //normal operation mode
@@ -26,11 +28,6 @@ void setup()
   //EIMSK |=(1<<INT0); //interrupt 0 (pin 2)
   //EICRA |=(1<<ISC01); //falling edge
   //sei(); //enable glob interrupts
-}
-
-void WISR()
-{
-    count++;
 }
 
 void loop()
@@ -47,7 +44,17 @@ void loop()
   count = 0; //reset count
   lastTime = time; //<-- fuck up if dt = 0;
   //Serial.print(count-lastCount);
-  Serial.println(freq);
-  //Serial.println("hello");
-  //lastCount = count;
+  Serial.print(freq);
+  Serial.print("\t");
+  Serial.println(object);
+  if (freq < DETECT_THRESHOLD) 
+  {
+    object = true;    
+  }
+}
+
+
+void WISR()//EXT_INT0_vect)
+{
+    count++;
 }
