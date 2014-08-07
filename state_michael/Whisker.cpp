@@ -8,11 +8,11 @@ Whisker::Whisker(void){
 	deltaTime = 0;
 	freq = 0;
 	object = false;
-        foundWeight = false;
 }
 
 
-bool Whisker::detect (void){
+bool Whisker::detect (bool quick){
+  _prevObject = object;
   cli(); //critical section
   time = TCNT1;
   pulses = count; 
@@ -23,28 +23,41 @@ bool Whisker::detect (void){
   }
   count = 0; //reset count
   lastTime = time;
+//  Serial.print("freq: ");
   Serial.println(freq);
-  //Serial.print("\t");
-  //Serial.println(object);
   if (freq < DETECT_THRESHOLD){
     object = true;    
   }
   else{
     object = false;
+  }  
+  if(quick){
+   return object; 
   }
-  return object;
+  if(doubleCheck(object)){
+    _noChange = object;
+    return object; 
+  }
+  else{
+    return _noChange;
+  }
 }
 
-bool Whisker::findWeight(void) {
-  if (detect()) {
-    _foundCount++;
+bool Whisker::doubleCheck(bool object) {
+  //Serial.print("sc: ");
+  //Serial.println(_sureCount);
+  if(_sureCount >= TOLERANCE){
+     _sureCount = 0;
+    return true; 
   }
-  if (!detect()) {
-    foundWeight = false;
-    _foundCount = 0;
+  else if(object == _prevObject){
+     _sureCount++; 
+     return false;
   }
-  if (_foundCount >= TOLERANCE) {
-    foundWeight = true;
+  else{
+    _sureCount = 0;
+    return false;
   }
-  return foundWeight;
 }
+
+  

@@ -54,13 +54,15 @@
   PID wallError;
   Switch powerSwitch(3);
   
-//  ColourSense colourView;
+  ColourSense colourView;
   
   WaveArm detector;
 
 // State things
 
 int setOff = FRONT;
+bool waving = true; //won't lose it here//////////////////////////////
+bool centred = false;
   
 // RTOS
 
@@ -83,8 +85,8 @@ void setup() {
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
   
-//  colourView.init();
-//  colourView.setHome();
+  colourView.init();
+  colourView.setHome();
   
   //WHISKER STUFF
   attachInterrupt(0, WISR, FALLING); //enable interrupt0 (pin2)
@@ -110,8 +112,10 @@ void resetRobot(void) {
   state.updateDriveState(STRAIGHT);
   updateSensors();
   determineWallFollow();
-//  colourView.setHome();
+  colourView.setHome();
   frontSensor.write(SENSOR_MIDDLE);
+  waving = true;
+  state.navigationState = WALL_FOLLOW;
 }
 
 
@@ -138,18 +142,18 @@ void checkPowerSwitch() {
 
 
 
-//void checkColour(void) {
-//  colourView.detectBase();
-//  if (colourView.area == ENEMY) {
-//    state.updateNavigationState(EVACUATE);
-//  }
-//  if (colourView.area == ARENA) {
-//    motors.setMotorSpeed(70);
-//  }
-//  if (colourView.area == HOME) {
-//    motors.setMotorSpeed(50);
-//  }
-//}
+void checkColour(void) {
+  colourView.detectBase();
+  if (colourView.area == ENEMY) {
+    state.updateNavigationState(EVACUATE);
+  }
+  if (colourView.area == ARENA) {
+    motors.setMotorSpeed(70);
+  }
+  if (colourView.area == HOME) {
+    motors.setMotorSpeed(50);
+  }
+}
 
 
 
@@ -169,7 +173,6 @@ void updateSensors (void) {
 
 void updateWallError (void) {
   //angularError.findError(compass.currentAngle);
-  determineWallFollow();
   
   if (state.followState == RIGHT_WALL) {
     wallError.findError(infaRight.filteredRead);
@@ -188,7 +191,7 @@ void determineWallFollow (void) {
     state.followState = RIGHT_WALL;
   }
   if (infaLeft.filteredRead > infaRight.filteredRead) {
-    state.followState = RIGHT_WALL;
+    state.followState = LEFT_WALL;
   }
 }
 
@@ -198,7 +201,7 @@ void determineWallFollow (void) {
 
 void driveRobot (int driveDirection) {
   if (state.driveState == STRAIGHT) {
-    float straightError = -driveDirection * state.followState * wallError.error/13;
+    float straightError = -driveDirection * state.followState * wallError.error/10;
     motors.drive(straightError, motors.motorSpeed, driveDirection);
   }
   
@@ -211,12 +214,13 @@ void driveRobot (int driveDirection) {
 
 
 void navigateCorner (void) {
-   if (state.driveState == STRAIGHT && infaFront.findWall(500)) {
+   if (state.driveState == STRAIGHT && infaFront.findWall(400)) {
       motors.fullStop();
       state.updateDriveState(TURNING);
       int sensorTurnAngle = SENSOR_MIDDLE + state.followState*SENSOR_ANGLE;
       frontSensor.write(sensorTurnAngle);
       setOff = FRONT;
+      determineWallFollow();
     }
   else if (state.driveState == TURNING && !infaFront.findWall(300) && setOff == FRONT) {
     
@@ -236,77 +240,93 @@ void avoidWallState (void) {
       motors.fullStop();
       state.updateDriveState(TURNING);
       setOff = SIDE;
+      determineWallFollow();
     }
-    else if (state.driveState == TURNING && !(infaLeft.findWall(200) || infaRight.findWall(200)) && setOff == SIDE) {
+    else if (state.driveState == TURNING && !(infaLeft.findWall(150) || infaRight.findWall(150)) && setOff == SIDE) {
         state.updateDriveState(STRAIGHT);
       }
     wallError.error = 0;
 }
 
-    
-  
-void waveArm(void){
-  detectorArm.write(detector.currentAngle); 
-    if (tick % 10 == 0) {
-      detector.armPos();
-   }
-}
-    
-
-
-
-
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
 void loop() {
+   checkPowerSwitch();
   
-  checkPowerSwitch();
-  
-  switch (state.powerState) {
-    case ON:
+    switch (state.powerState) {
+      case ON:
       updateSensors();
-//      checkColour();
-        
-      if (tick % 10 == 0) {
-  //      compass.findAngle();
-//          colourView.findColour();
-      }
+      checkColour();
+      
+      if (tick % 40 == 0) {
+      //      compass.findAngle();
+            colourView.findColour();
+        }
+      
+      updateWallError();
       
       switch (state.navigationState) {
-        
-        updateWallError();
-        
+      
         case EVACUATE:
           state.updateNavigationState(SEARCHING);
-          //motors.fullStop();
+          motors.fullStop();
+          leftWheel.write(motors.leftValue);
+          rightWheel.write(motors.rightValue);
+          delay(50);
           //leaveEnemyBase();
-          break;
-        
+        break;
+      
         case WALL_FOLLOW: 
           wallError.setDesiredValue(350);
           navigateCorner();
-          break;
-
+        break;
+      
         case SEARCHING: 
           wallError.setDesiredValue(300);
           avoidWallState();
-          waveArm();
-          whisker.findWeight();
-          break;
-         
-        driveRobot(FORWARDS); 
-        }
+          if(whisker.detect(SLOW)){
+            waving = false;
+            motors.fullStop();
+            //state.updateNavigationState(ALIGNING); 
+          }
+          detector.waveArm(waving, detectorArm, tick);
         break;
+      
+  //     case ALIGNING:
+  //       Serial.println(centred);
+  //         if(!centred){
+  //           motors.fullStop();
+  //           centred = detector.align(detectorArm);
+  //         }
+  //         else if(centred){
+  //           if(whisker.detect(QUICK)){
+  //            motors.fullStop(); 
+  //            state.updateNavigationState(COLLECTING); 
+  //           }
+  //           else {
+  //             motors.turn(25, 1); //turn until find the weight again
+  //           }
+  //         }
+  
+         //break; 
+      
+        case COLLECTING:
+          state.updateNavigationState(SEARCHING); 
+        break;
+      }
+        driveRobot(FORWARDS);
+    break;
   
   case OFF:
     motors.fullStop();
-    break;
+  break;
   }
-  
-//  Serial.println(whisker.findWeight());
-  
-  //leftWheel.write(motors.leftValue);
-  //rightWheel.write(motors.rightValue);
-  tick++;
+    
+    
+    leftWheel.write(motors.leftValue);
+    rightWheel.write(motors.rightValue);
+    tick++;
 }
 
 

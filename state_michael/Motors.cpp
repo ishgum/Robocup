@@ -14,6 +14,7 @@ Motors::Motors(void)
 void Motors::fullStop (void) {
   leftValue = ZERO_VALUE;
   rightValue = ZERO_VALUE;
+  motorSpeed = 0;
 }
 
 void Motors::checkClipping(void) {
@@ -38,7 +39,7 @@ void Motors::drive (signed int error, signed int speedPercent, signed int dir) {
   
   leftValue = (ZERO_VALUE + dir*(speedMotors + error));
   rightValue = (ZERO_VALUE + dir*(speedMotors - error));
-  
+  //Serial.println(leftValue);
   checkClipping();
 }
 

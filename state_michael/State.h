@@ -18,6 +18,8 @@
 #define WALL_FOLLOW 0
 #define SEARCHING 1
 #define EVACUATE 2
+#define ALIGNING 3
+#define COLLECTING 4
 
 #define RIGHT_WALL -1
 #define LEFT_WALL 1
