@@ -115,6 +115,7 @@ void resetRobot(void) {
   colourView.setHome();
   frontSensor.write(SENSOR_MIDDLE);
   waving = true;
+  motors.setMotorDir = FORWARDS;
   state.navigationState = WALL_FOLLOW;
 }
 
@@ -149,9 +150,11 @@ void checkColour(void) {
   }
   if (colourView.area == ARENA) {
     motors.setMotorSpeed(70);
+    motors.setTurnSpeed(70);
   }
   if (colourView.area == HOME) {
     motors.setMotorSpeed(50);
+    motors.setTurnSpeed(50);
   }
 }
 
@@ -173,7 +176,7 @@ void updateSensors (void) {
 
 void updateWallError (void) {
   //angularError.findError(compass.currentAngle);
-  determineWallFollow;
+  
   if (state.followState == RIGHT_WALL) {
     wallError.findError(infaRight.filteredRead);
   }
@@ -189,26 +192,15 @@ void determineWallFollow (void) {
   
   if (infaLeft.filteredRead <= infaRight.filteredRead) {
     state.followState = RIGHT_WALL;
+    motors.setTurnDir(MOTOR_CCW);
   }
   if (infaLeft.filteredRead > infaRight.filteredRead) {
     state.followState = LEFT_WALL;
+    motors.setTurnDir(MOTOR_CCW);
   }
 }
 
 
-
-
-
-void driveRobot (int driveDirection) {
-  if (state.driveState == STRAIGHT) {
-    float straightError = -driveDirection * state.followState * wallError.error/10;
-    motors.drive(straightError, motors.motorSpeed, driveDirection);
-  }
-  
-  if (state.driveState == TURNING) {      
-    motors.turn(70, state.followState);
-  } 
-}
 
 
 
@@ -271,8 +263,6 @@ void loop() {
         case EVACUATE:
           state.updateNavigationState(SEARCHING);
           motors.fullStop();
-          leftWheel.write(motors.leftValue);
-          rightWheel.write(motors.rightValue);
           delay(50);
           //leaveEnemyBase();
         break;
@@ -285,7 +275,6 @@ void loop() {
         case SEARCHING: 
           wallError.setDesiredValue(300);
           avoidWallState();
-          waving = true;
           if(whisker.detect(SLOW)){
             waving = false;
             motors.fullStop();
@@ -316,7 +305,6 @@ void loop() {
           state.updateNavigationState(SEARCHING); 
         break;
       }
-        driveRobot(FORWARDS);
     break;
   
   case OFF:
@@ -324,7 +312,7 @@ void loop() {
   break;
   }
     
-    
+    motors.driveRobot(state, wallError.scaledError);
     leftWheel.write(motors.leftValue);
     rightWheel.write(motors.rightValue);
     tick++;
