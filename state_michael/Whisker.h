@@ -7,7 +7,9 @@
 
 #define MAX_TIME 60000
 #define CONV 250000 //for 1 clock tick every 4us (250kHz clock)
-#define DETECT_THRESHOLD 6500
+#define DETECT_THRESHOLD 6100
+
+#define TOLERANCE 5
 
 class Whisker
 {
@@ -15,14 +17,17 @@ class Whisker
 		Whisker(void);
 		//void WISR(void);		
                 bool detect(void);
+                bool findWeight(void);
 		bool object;
+                bool foundWeight;
 		volatile unsigned int count;
 	private:
 		unsigned int pulses;
-		unsigned int lastTime = 0;
-		unsigned int time = 0;
-		unsigned int deltaTime = 0;
-		unsigned long freq = 0;
+		unsigned int lastTime;
+		unsigned int time;
+		unsigned int deltaTime;
+		unsigned long freq;
+                unsigned long _foundCount;
 };
 
 #endif

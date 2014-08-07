@@ -54,7 +54,7 @@
   PID wallError;
   Switch powerSwitch(3);
   
-  ColourSense colourView;
+//  ColourSense colourView;
   
   WaveArm detector;
 
@@ -83,8 +83,8 @@ void setup() {
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
   
-  colourView.init();
-  colourView.setHome();
+//  colourView.init();
+//  colourView.setHome();
   
   //WHISKER STUFF
   attachInterrupt(0, WISR, FALLING); //enable interrupt0 (pin2)
@@ -110,7 +110,7 @@ void resetRobot(void) {
   state.updateDriveState(STRAIGHT);
   updateSensors();
   determineWallFollow();
-  colourView.setHome();
+//  colourView.setHome();
   frontSensor.write(SENSOR_MIDDLE);
 }
 
@@ -138,18 +138,18 @@ void checkPowerSwitch() {
 
 
 
-void checkColour(void) {
-  colourView.detectBase();
-  if (colourView.area == ENEMY) {
-    state.updateNavigationState(EVACUATE);
-  }
-  if (colourView.area == ARENA) {
-    motors.setMotorSpeed(70);
-  }
-  if (colourView.area == HOME) {
-    motors.setMotorSpeed(50);
-  }
-}
+//void checkColour(void) {
+//  colourView.detectBase();
+//  if (colourView.area == ENEMY) {
+//    state.updateNavigationState(EVACUATE);
+//  }
+//  if (colourView.area == ARENA) {
+//    motors.setMotorSpeed(70);
+//  }
+//  if (colourView.area == HOME) {
+//    motors.setMotorSpeed(50);
+//  }
+//}
 
 
 
@@ -169,16 +169,31 @@ void updateSensors (void) {
 
 void updateWallError (void) {
   //angularError.findError(compass.currentAngle);
+  determineWallFollow();
   
-  if (infaLeft.filteredRead <= infaRight.filteredRead) {
-    state.followState = RIGHT_WALL;
+  if (state.followState == RIGHT_WALL) {
     wallError.findError(infaRight.filteredRead);
   }
-  if (infaLeft.filteredRead > infaRight.filteredRead) {
-    state.followState = RIGHT_WALL;
+  if (state.followState == LEFT_WALL) {
     wallError.findError(infaLeft.filteredRead);
   }
 }
+
+
+
+void determineWallFollow (void) {
+  //angularError.findError(compass.currentAngle);
+  
+  if (infaLeft.filteredRead <= infaRight.filteredRead) {
+    state.followState = RIGHT_WALL;
+  }
+  if (infaLeft.filteredRead > infaRight.filteredRead) {
+    state.followState = RIGHT_WALL;
+  }
+}
+
+
+
 
 
 void driveRobot (int driveDirection) {
@@ -216,7 +231,7 @@ void navigateCorner (void) {
 
 
 void avoidWallState (void) {
-    followWallState ();
+    navigateCorner ();
     if (state.driveState == STRAIGHT && (infaLeft.findWall(400) || infaRight.findWall(400))) {
       motors.fullStop();
       state.updateDriveState(TURNING);
@@ -249,17 +264,22 @@ void loop() {
   switch (state.powerState) {
     case ON:
       updateSensors();
-      checkColour();
+//      checkColour();
         
-      if (tick % 200 == 0) {
+      if (tick % 10 == 0) {
   //      compass.findAngle();
-          colourView.findColour();
+//          colourView.findColour();
       }
       
       switch (state.navigationState) {
         
         updateWallError();
-        driveRobotForwards();
+        
+        case EVACUATE:
+          state.updateNavigationState(SEARCHING);
+          //motors.fullStop();
+          //leaveEnemyBase();
+          break;
         
         case WALL_FOLLOW: 
           wallError.setDesiredValue(350);
@@ -270,13 +290,10 @@ void loop() {
           wallError.setDesiredValue(300);
           avoidWallState();
           waveArm();
+          whisker.findWeight();
           break;
-          
-        case EVACUATE:
-          state.updateNavigationState(SEARCHING);
-          //motors.fullStop();
-          //leaveEnemyBase();
-          break;
+         
+        driveRobot(FORWARDS); 
         }
         break;
   
@@ -285,7 +302,7 @@ void loop() {
     break;
   }
   
-  Serial.println(whisker.found);
+//  Serial.println(whisker.findWeight());
   
   //leftWheel.write(motors.leftValue);
   //rightWheel.write(motors.rightValue);

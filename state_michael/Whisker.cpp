@@ -8,6 +8,7 @@ Whisker::Whisker(void){
 	deltaTime = 0;
 	freq = 0;
 	object = false;
+        foundWeight = false;
 }
 
 
@@ -22,9 +23,9 @@ bool Whisker::detect (void){
   }
   count = 0; //reset count
   lastTime = time;
-  Serial.print(freq);
-  Serial.print("\t");
-  Serial.println(object);
+  Serial.println(freq);
+  //Serial.print("\t");
+  //Serial.println(object);
   if (freq < DETECT_THRESHOLD){
     object = true;    
   }
@@ -34,6 +35,16 @@ bool Whisker::detect (void){
   return object;
 }
 
-//void Whisker::WISR(void){
-//    count++;
-//}
+bool Whisker::findWeight(void) {
+  if (detect()) {
+    _foundCount++;
+  }
+  if (!detect()) {
+    foundWeight = false;
+    _foundCount = 0;
+  }
+  if (_foundCount >= TOLERANCE) {
+    foundWeight = true;
+  }
+  return foundWeight;
+}

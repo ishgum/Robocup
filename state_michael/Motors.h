@@ -21,13 +21,14 @@ class Motors
                 void fullStop (void);
 		void drive (signed int error, signed int speedPercent, signed int dir);
                 void turn (unsigned int speedPercent, signed int dir);
+                void setMotorSpeed(int newSpeed);
                 
                 int leftValue;
                 int rightValue;
+                int motorSpeed;
 	private:
                 void checkClipping();
-		int _zero;
-                int _fullSpeed;
+
                 
                 
 	
