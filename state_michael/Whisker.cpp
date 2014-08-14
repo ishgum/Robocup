@@ -11,24 +11,27 @@ Whisker::Whisker(void){
 }
 
 
-bool Whisker::detect (bool quick){
+bool Whisker::detect (void){
 	//_prevObject = object;
 	cli(); //critical section
 	time = TCNT1;
 	pulses = count; 
 	sei();
 	deltaTime = time - lastTime; //time difference between last poll
-	if(deltaTime < MAX_TIME){ //-ve if overflow and no NaN
+	//if(deltaTime < MAX_TIME){ //-ve if overflow and no NaN
 		if (deltaTime == 0) {
+               	Serial.println("=[");  
 			return -1;
 		}else{
 			freqRead = (pulses*CONV)/deltaTime; 
 		}
-	}
-	//count = 0; //reset count
-	//lastTime = time;
-	//Serial.print("freq: ");
-	//Serial.println(freqRead);
+	//}
+	count = 0; //reset count
+	lastTime = time;
+	Serial.print("freq: ");
+	Serial.print(freqRead);
+        Serial.print("\t\t\t\t");
+	Serial.println(freq);
 	
 	filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + freqRead; 
 	freq = filter_reg >> FILTER_SHIFT;
@@ -48,8 +51,10 @@ bool Whisker::detect (bool quick){
 	//}else{
 	//	return _noChange;
 	//}
+        //count = 0;
 }
 
+/*
 bool Whisker::doubleCheck(bool object) {
 	//Serial.print("sc: ");
 	//Serial.println(_sureCount);
@@ -66,5 +71,6 @@ bool Whisker::doubleCheck(bool object) {
 		return false;
 	}
 }
+*/
 
 

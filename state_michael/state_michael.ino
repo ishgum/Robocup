@@ -115,7 +115,7 @@ void resetRobot(void) {
   colourView.setHome();
   frontSensor.write(SENSOR_MIDDLE);
   waving = true;
-  state.navigationState = WALL_FOLLOW;
+  state.navigationState = SEARCHING;
 }
 
 
@@ -252,10 +252,14 @@ void avoidWallState (void) {
 //////////////////////////////////////////////////////////////////
 
 void loop() {
+              motors.fullStop();///////////////////////////////////////////////////////////////////////////
+                      	
    checkPowerSwitch();
+   
   
-    switch (state.powerState) {
-      case ON:
+    //switch (state.powerState) {
+      //case ON:
+      if(state.powerState == ON) {
       updateSensors();
       checkColour();
       
@@ -265,12 +269,12 @@ void loop() {
         }
       
       updateWallError();
-      
-      switch (state.navigationState) {
+     switch (state.navigationState) {
+       
       
         case EVACUATE:
           state.updateNavigationState(SEARCHING);
-          motors.fullStop();
+         motors.fullStop();
           leftWheel.write(motors.leftValue);
           rightWheel.write(motors.rightValue);
           delay(50);
@@ -282,33 +286,34 @@ void loop() {
           navigateCorner();
         break;
       
-        case SEARCHING: 
-          wallError.setDesiredValue(300);
-          avoidWallState();
-          waving = true;
-          if(whisker.detect(SLOW)){
-            waving = false;
-            motors.fullStop();
-            //state.updateNavigationState(ALIGNING); 
-          }
-          detector.waveArm(waving, detectorArm, tick);
+          case SEARCHING: 
+            //wallError.setDesiredValue(300);
+            //avoidWallState();
+            waving = true;
+            if(whisker.detect()){
+              waving = false;
+              Serial.println("FOUND");
+              //motors.fullStop();
+              //state.updateNavigationState(ALIGNING); 
+            }
+            detector.waveArm(waving, detectorArm, tick);
         break;
       
-  //     case ALIGNING:
-  //       Serial.println(centred);
-  //         if(!centred){
-  //           motors.fullStop();
-  //           centred = detector.align(detectorArm);
-  //         }
-  //         else if(centred){
-  //           if(whisker.detect(QUICK)){
-  //            motors.fullStop(); 
-  //            state.updateNavigationState(COLLECTING); 
-  //           }
-  //           else {
-  //             motors.turn(25, 1); //turn until find the weight again
-  //           }
-  //         }
+       case ALIGNING:
+         Serial.println(centred);
+           if(!centred){
+             motors.fullStop();
+             centred = detector.align(detectorArm);
+           }
+           else if(centred){
+             if(whisker.detect(QUICK)){
+              motors.fullStop(); 
+              state.updateNavigationState(COLLECTING); 
+             }
+             else {
+               motors.turn(25, 1); //turn until find the weight again
+             }
+           }
   
          //break; 
       
@@ -317,11 +322,12 @@ void loop() {
         break;
       }
         driveRobot(FORWARDS);
-    break;
+    //break;
+      }else{
+  //case OFF:
   
-  case OFF:
     motors.fullStop();
-  break;
+  //break;
   }
     
     

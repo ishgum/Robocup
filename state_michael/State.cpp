@@ -4,7 +4,7 @@
 State::State(void)
 {
   powerState = OFF;
-  navigationState = WALL_FOLLOW;
+  navigationState = SEARCHING;
   driveState = STOPPED;
   followState = RIGHT_WALL;
 }
