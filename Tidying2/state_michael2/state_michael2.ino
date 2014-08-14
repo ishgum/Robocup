@@ -1,10 +1,10 @@
 
 #include <Servo.h> 
-#include <Scheduler.h>
 #include <Wire.h>
 #include <FreeSixIMU.h>
 #include <HMC5883L.h>
 #include "Adafruit_TCS34725.h"
+
 
 #include "Sensors.h"
 #include "State.h"
@@ -12,6 +12,7 @@
 #include "Switch.h"
 #include "Whisker.h"
 #include "WaveArm.h"
+#include "Motors.h"
 
 
 /**** SET UP ****/
@@ -24,15 +25,6 @@
 #define SENSOR_ANGLE 30
 
 
-
-#define MOTOR_ZERO_VALUE 90
-#define MOTOR_FULL_SPEED 65
-
-#define MOTOR_FORWARDS 1
-#define MOTOR_BACKWARDS -1
-
-#define MOTOR_CW 1
-#define MOTOR_CCW -1
 
 // Peripherals
 
@@ -50,7 +42,10 @@
   Sensors infaRight(1);
 
 
-  State state;
+  State powerState(STATE_OFF);
+  State navigationState(STATE_WALL_FOLLOW);
+  State driveState(STATE_STRAIGHT);
+  State followState(STATE_LEFT_WALL);
 
   PID leftError;
   PID rightError;
@@ -66,7 +61,7 @@ bool centred = false;
   
 // RTOS
   
-  
+unsigned long long tick;  
  /**** Program ****/
   
   
@@ -93,8 +88,7 @@ void setup() {
   TCCR1B = 0x03; //64x prescale for 250kHz clock
   TCNT1=0x0000; //16bit counter register initialised to 0
   
-  Scheduler.startLoop(loop2);
-  //Scheduler.startLoop(loop3);
+  tick = 0;
   
 }
 
@@ -106,8 +100,8 @@ void WISR(void)
 
 
 void initRobot(void) {
-  state.updateDriveState(STATE_STRAIGHT);
-  state.updateNavigationState(STATE_WALL_FOLLOW);
+  driveState.setToDefault();
+  navigationState.setToDefault();
   setMotorDir(MOTOR_FORWARDS);
   
   updateSensors();
@@ -126,13 +120,13 @@ void checkPowerSwitch() {
   
   switch (powerSwitch.switchState) {
     case SWITCH_ON:
-    state.updatePowerState(STATE_ON);
+    powerState.updateState(STATE_ON);
     initRobot();
     
     break;
   case SWITCH_OFF:
-    state.updatePowerState(STATE_OFF);
-    state.updateDriveState(STATE_STOPPED);
+    powerState.updateState(STATE_OFF);
+    driveState.updateState(STATE_STOPPED);
     break;
   }
 }
@@ -153,7 +147,6 @@ void updateSensors (void) {
 // Updates the error for the angle as well as for the wall following
 
 void updateErrors (void) {
-  
     rightError.findError(infaRight.filteredRead);
     leftError.findError(infaLeft.filteredRead);
 }
@@ -163,11 +156,11 @@ void updateErrors (void) {
 void determineWallFollow (void) {
     
   if (infaLeft.filteredRead <= infaRight.filteredRead) {
-    state.followState = STATE_RIGHT_WALL;
+    followState.updateState(STATE_RIGHT_WALL);
     setTurnDir(MOTOR_CCW);
   }
   if (infaLeft.filteredRead > infaRight.filteredRead) {
-    state.followState = STATE_LEFT_WALL;
+    followState.updateState(STATE_LEFT_WALL);
     setTurnDir(MOTOR_CW);
   }
 }
@@ -181,53 +174,22 @@ void loop() {
   
   checkPowerSwitch();
   
-  switch (state.powerState) {
+  switch (powerState.returnState()) {
     case STATE_ON:
-    updateSensors();
-    checkColour();
-    updateErrors();
-    delay(50);
+    if (tick % 50) {
+      updateSensors();
+      checkColour();
+    }
+    if (tick % 100) {
+      navigateRobot();
+    }
   break;
   
   case STATE_OFF:
     fullStop();
   break;
   }
-}
-
-
-void loop2() {
-  switch (state.navigationState) {
-      
-        case STATE_EVACUATE:
-          state.updateNavigationState(STATE_SEARCHING);
-          fullStop();
-          //leaveEnemyBase();
-        break;
-      
-        case STATE_WALL_FOLLOW: 
-          leftError.setDesiredValue(350);
-          rightError.setDesiredValue(350);
-          navigateCorner();
-        break;
-      
-        case STATE_SEARCHING: 
-          leftError.setDesiredValue(300);
-          rightError.setDesiredValue(300);
-          avoidWall();
-          if(whisker.detect(SLOW)){
-            waving = false;
-            fullStop();
-            //state.updateNavigationState(ALIGNING); 
-          }
-          //detector.waveArm(waving, detectorArm, tick);
-        break;
-      
-        case STATE_COLLECTING:
-          state.updateNavigationState(STATE_SEARCHING); 
-        break;
-      }
-  
+  tick++;
 }
 
 

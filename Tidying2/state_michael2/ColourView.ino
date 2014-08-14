@@ -79,7 +79,7 @@ void checkColour(void) {
   findColour();
   detectBase();
   if (area == AREA_ENEMY) {
-    state.updateNavigationState(STATE_EVACUATE);
+    navigationState.updateState(STATE_EVACUATE);
   }
   if (area == AREA_ARENA) {
     setMotorSpeed(70);

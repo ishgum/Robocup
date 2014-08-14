@@ -29,20 +29,15 @@
 class State
 {
 	public:
-		State (void);
-                void updatePowerState (int changeState);
-                void updateNavigationState (int changeState);
-                void updateDriveState (int changeState);
-                void updateFollowState (int changeState);
-                
-                int powerState;
-                int navigationState;
-                int driveState;
-                int followState;
+		State (int defaultState);
+                void setToDefault(void);
+                void updateState (int changeState);
+                int returnState (void);
                 
                 bool init;
 	private:
-	
+	        int _currentState;
+                int _default;
 	
     
 };

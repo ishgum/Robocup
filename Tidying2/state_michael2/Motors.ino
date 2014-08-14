@@ -76,11 +76,11 @@ void setTurnDir (int newDir) {
 
 
 void driveRobot (State state, int straightError) {
-  if (state.driveState == STATE_STRAIGHT) {
+  if (driveState.returnState() == STATE_STRAIGHT) {
     straight(straightError);
   }
   
-  if (state.driveState == STATE_TURNING) {      
+  if (driveState.returnState() == STATE_TURNING) {      
     turn();
   } 
 }
