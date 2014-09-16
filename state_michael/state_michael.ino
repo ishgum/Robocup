@@ -38,7 +38,8 @@
   Servo frontSensor;
   Servo leftWheel;
   Servo rightWheel;
-  Servo detectorArm;
+  Servo collectorArmLeft;
+  Servo collectorArmRight;
   
   
   Whisker whisker;
@@ -56,7 +57,8 @@
   
   ColourSense colourView;
   
-  WaveArm detector;
+  WaveArm collectorRight;
+  Wavearm collectorLeft;
 
 // State things
 
@@ -81,7 +83,8 @@ void setup() {
   digitalWrite(DIGITAL_OUT_POWER, 1);
 
   frontSensor.attach(10);
-  detectorArm.attach(11);
+  collectorArmLeft.attach(11);
+  collectorArmRight.attach(11);
   leftWheel.attach(12);  // S11 (on port S6)
   rightWheel.attach(13); // S12 (on port S6)
   
@@ -290,9 +293,9 @@ void loop() {
             //wallError.setDesiredValue(300);
             //avoidWallState();
             waving = true;
-            if(whisker.detect()){
-              waving = false;
-              Serial.println("FOUND");
+            //if(whisker.detect()){
+              //waving = false;
+              //Serial.println("FOUND");
               //motors.fullStop();
               //state.updateNavigationState(ALIGNING); 
             }
