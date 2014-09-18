@@ -26,9 +26,10 @@ void setup() {
   rightArmServo.attach(9);
   gateServo.attach(13);
   
+  Serial.println("Got here");
   initColourView();
  
-  
+  Serial.println("Got here");
   //WHISKER STUFF
     cli();
   attachInterrupt(5, WISR, FALLING); //enable interrupt0 (pin2)
@@ -39,6 +40,9 @@ void setup() {
   sei(); 
   
   tick = 0;
+  
+  leftError.setDesiredValue(300);
+  rightError.setDesiredValue(300);
   
 }
 
@@ -89,6 +93,7 @@ void updateSensors (void) {
   infaLeft.updateSensor();
   infaRight.updateSensor();
   infaBottom.updateSensor();
+  
 }
 
 void sweepAll (void) {
@@ -125,6 +130,7 @@ void loop() {
     findWeights();
     if (tick % 100 == 0) {
       checkColour();
+      }
     }
     if (tick % 4 == 0) {
       navigateRobot();

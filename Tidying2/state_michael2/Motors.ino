@@ -40,16 +40,32 @@ void checkClipping(void) {
 
 // Drives the robot straight - with PID
 void straight (signed int error) {
-  leftValue = MOTOR_ZERO_VALUE + motorDir*(motorSpeed + followState.returnState()*error);
-  rightValue = MOTOR_ZERO_VALUE + motorDir*(motorSpeed - followState.returnState()*error);
-  Serial.print(leftValue); Serial.print('\t'); Serial.println(rightValue);
+  //Serial.println(MOTOR_ZERO_VALUE + motorDir*(motorSpeed + error));
+  int leftValue = MOTOR_ZERO_VALUE + motorDir*(motorSpeed + turnDir*error);
+  int rightValue = MOTOR_ZERO_VALUE + motorDir*(motorSpeed - turnDir*error);
+  
+  if (leftValue > (MOTOR_ZERO_VALUE + MOTOR_FULL_SPEED)) {
+    leftValue = MOTOR_ZERO_VALUE + MOTOR_FULL_SPEED;
+  }
+  if (leftValue < (MOTOR_ZERO_VALUE - MOTOR_FULL_SPEED)) {
+    leftValue = MOTOR_ZERO_VALUE - MOTOR_FULL_SPEED;
+  }
+  if (rightValue > (MOTOR_ZERO_VALUE + MOTOR_FULL_SPEED)) {
+    rightValue = MOTOR_ZERO_VALUE + MOTOR_FULL_SPEED;
+  }
+  if (rightValue < (MOTOR_ZERO_VALUE - MOTOR_FULL_SPEED)) {
+    rightValue = MOTOR_ZERO_VALUE - MOTOR_FULL_SPEED;
+  }
+  Serial.println(leftValue);
+  leftWheel.write(leftValue);
+  rightWheel.write(rightValue);
 }
 
 // Turns the robot
 void turn (void) {
  
-  leftValue = MOTOR_ZERO_VALUE + turnDir*turnSpeed;
-  rightValue = MOTOR_ZERO_VALUE - turnDir*turnSpeed;
+  leftWheel.write(MOTOR_ZERO_VALUE - turnDir*turnSpeed);
+  rightWheel.write(MOTOR_ZERO_VALUE + turnDir*turnSpeed);
   
 }
 

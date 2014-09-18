@@ -13,6 +13,7 @@ Switch::Switch(int port)
 // Updates a single sensor using a MAF
 
 void Switch::updateSwitch () {
+ 
    if (analogRead(_port) != 0) {
      _offCount = 0;
      _onCount += 1;
