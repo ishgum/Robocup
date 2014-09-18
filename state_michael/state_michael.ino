@@ -61,7 +61,7 @@
 // State things
 
 int setOff = FRONT;
-bool waving = true; //won't lose it here//////////////////////////////
+bool waving = true; 
 bool centred = false;
   
 // RTOS
