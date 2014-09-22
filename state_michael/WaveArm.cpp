@@ -1,27 +1,47 @@
-
+#include "Servo.h"
 #include "WaveArm.h"
+/* Functions to move the sweeper arms */
 
-
-
-
+#define ARMS_IN 1
+#define ARMS_OUT 0
 
 WaveArm::WaveArm(void)
 {
   currentAngle = 0;
   currentDirection = ARM_CLOCKWISE;
-
 }
 
-void WaveArm::armPos() {
-    currentAngle = currentAngle + currentDirection;
-    if (currentAngle >= MAX_ANGLE) {
-      currentDirection = ARM_ANTI;
-    }
-    if (currentAngle <= MIN_ANGLE) {
-      currentDirection = ARM_CLOCKWISE;
-    }
-    //Serial.print("currentAngle: ");
-    //Serial.println(currentAngle);
+bool WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
+	if(angle<180){
+		sweepArmLeft.write(angle);
+		sweepArmRight.write(angle);
+		angle += 1;
+	}else{
+		return 1;
+	}
+}
+
+bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
+	if(angle>0){
+		sweepArmLeft.write(angle);
+		sweepArmRight.write(angle);
+		angle -= 1;
+	}else{
+		return 0;
+	}
+}
+
+//250kHz clock input is in ms delay between movement 6 optimal, 3 max
+void WaveARm::collect(int speed_ms){
+	if(time && ARMS_OUT){
+		sweepIn(sweepArmLeft, sweepArmRight);
+	}
+	if(not_collected()){
+		wait;
+	}
+	if(time && ARMS_IN){
+		sweepOut(sweepArmLeft, SweepArmRight);
+	}
 }
 
 void WaveArm::waveArm(bool waving, Servo servo, unsigned long tick){
@@ -29,29 +49,3 @@ void WaveArm::waveArm(bool waving, Servo servo, unsigned long tick){
       servo.write(currentAngle); 
       armPos();
    }
-}
-
-//called when weight located
-//move arm to centre position
-//if weight still not there
-//assume weight to be on outside
-//rotate CW until weight hit
-//sit, good boy!
-
-void WaveArm::moveToCentre() {
-  delay(100);///////////////////////////BADBADBADBADBADBADBADBAD????????????????????????????????????????///////////////////
-  currentAngle += ARM_ANTI;
-}
-
-
-//moves arm to centre
-bool WaveArm::align(Servo servo){
-  centred = false;
-  moveToCentre();
-  if(currentAngle == CENTRE_ANGLE){
-    centred = true;
-  }
-  servo.write(currentAngle);
-  return centred;
-}
-
