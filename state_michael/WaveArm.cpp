@@ -33,19 +33,17 @@ bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
 void WaveARm::collect(int speed_ms){
-	if(time && ARMS_OUT){
+	curr_time = ticks;
+	delta_ms = (curr_time-prev_time)/CONV;
+	if(delta_ms>speed_ms && ARMS_OUT){
 		sweepIn(sweepArmLeft, sweepArmRight);
+		prev_time = curr_time;
 	}
 	if(not_collected()){
 		wait;
 	}
-	if(time && ARMS_IN){
+	if(delta_ms>speed_ms && ARMS_IN){
 		sweepOut(sweepArmLeft, SweepArmRight);
+		prev_time = curr_time;
 	}
 }
-
-void WaveArm::waveArm(bool waving, Servo servo, unsigned long tick){
-    if (tick % 10 == 0 && waving) {
-      servo.write(currentAngle); 
-      armPos();
-   }
