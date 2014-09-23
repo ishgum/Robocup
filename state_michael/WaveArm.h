@@ -34,7 +34,7 @@ class WaveArm{
 		unsigned long curr_time;
 		unsigned long prev_time;
 		unsigned long delta_ms;
-		int armLocation;
+		int armLocation = 0;
                 bool temp_dir;		
 };
 

@@ -35,7 +35,7 @@ bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
 void WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
 	curr_time = tick;
-	delta_ms = (curr_time-prev_time)/CONV;
+	delta_ms = (curr_time-prev_time);
 	if(delta_ms>SPEED_MS && armLocation==ARMS_OUT){
 		armLocation = sweepIn(sweepArmLeft, sweepArmRight);
 		prev_time = curr_time;
@@ -47,6 +47,8 @@ void WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
 		armLocation = sweepOut(sweepArmLeft, sweepArmRight);
 		prev_time = curr_time;
 	}
+Serial.print("\t::");
+        Serial.println(angle);
 }
 
 void WaveArm::knockOver(){
