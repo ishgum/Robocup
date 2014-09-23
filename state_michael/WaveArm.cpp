@@ -34,7 +34,7 @@ bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
 void WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
-	curr_time = tick;
+	curr_time = millis();
 	delta_ms = (curr_time-prev_time);
 	if(delta_ms>SPEED_MS && armLocation==ARMS_OUT){
 		armLocation = sweepIn(sweepArmLeft, sweepArmRight);

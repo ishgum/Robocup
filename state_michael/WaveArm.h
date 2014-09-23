@@ -9,9 +9,9 @@
 #define ARMS_OUT 0
 #define ANGLE_MAX 180
 #define ANGLE_MIN 0
-#define SPEED_MS 6
+#define SPEED_MS 10
 
-        extern volatile unsigned long tick;
+        //extern volatile unsigned long tick;
 
 /*Control functions for both sweeper arms together
   Control for knockover arms (?)
@@ -19,8 +19,7 @@
 	
 
 class WaveArm{
-//	global Servo sweepArmLeft;
-//	global Servo sweepArmRight;  
+  
 	public:
 		WaveArm (void);
                 void collect(Servo sweepArmLeft, Servo sweepArmRight);        
