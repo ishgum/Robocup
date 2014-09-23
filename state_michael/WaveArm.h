@@ -11,24 +11,31 @@
 #define ANGLE_MIN 0
 #define SPEED_MS 6
 
+        extern volatile unsigned long tick;
+
 /*Control functions for both sweeper arms together
   Control for knockover arms (?)
   Detection of weights within robot */
+	
 
+class WaveArm{
+//	global Servo sweepArmLeft;
+//	global Servo sweepArmRight;  
 	public:
 		WaveArm (void);
-        void collect(void);        
-		void knockover(void);
-        unsigned int angle;
+                void collect(Servo sweepArmLeft, Servo sweepArmRight);        
+	        void knockOver(void);
+                unsigned int angle;
 
 	private:
-		void sweepIn(Servo sweepArmLeft, Servo sweepArmRight);
-		void sweepOut(Servo sweepArmLeft, Servo sweepArmRight);
+		bool sweepIn(Servo sweepArmLeft, Servo sweepArmRight);
+		bool sweepOut(Servo sweepArmLeft, Servo sweepArmRight);
 		bool collected(void);
 		unsigned long curr_time;
 		unsigned long prev_time;
 		unsigned long delta_ms;
-		int armLocation;		
+		int armLocation;
+                bool temp_dir;		
 };
 
 #endif

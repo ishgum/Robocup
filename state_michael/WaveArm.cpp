@@ -2,12 +2,6 @@
 #include "WaveArm.h"
 /* Functions to move the sweeper arms */
 
-#define CONV 250000
-#define ARMS_IN 1
-#define ARMS_OUT 0
-#define ANGLE_MAX 180
-#define ANGLE_MIN 0
-#define SPEED_MS 6
 
 WaveArm::WaveArm(void)
 {
@@ -19,9 +13,11 @@ bool WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
 		sweepArmLeft.write(angle);
 		sweepArmRight.write(ANGLE_MAX - angle);
 		angle += 1;
+                temp_dir = ARMS_OUT;
 	}else{
-		return ARMS_IN;
+		temp_dir = ARMS_IN;
 	}
+    return temp_dir;
 }
 
 bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
@@ -29,14 +25,16 @@ bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 		sweepArmLeft.write(angle);
 		sweepArmRight.write(ANGLE_MAX - angle);
 		angle -= 1;
+                temp_dir = ARMS_IN;
 	}else{
-		return ARMS_OUT;
+		temp_dir = ARMS_OUT;
 	}
+    return temp_dir;
 }
 
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
-void WaveArm::collect(void){
-	curr_time = TCNT1;
+void WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
+	curr_time = tick;
 	delta_ms = (curr_time-prev_time)/CONV;
 	if(delta_ms>SPEED_MS && armLocation==ARMS_OUT){
 		armLocation = sweepIn(sweepArmLeft, sweepArmRight);
@@ -46,7 +44,7 @@ void WaveArm::collect(void){
 	//	wait;
 	//}
 	if(delta_ms>SPEED_MS && armLocation==ARMS_IN){
-		armLocation = sweepOut(sweepArmLeft, SweepArmRight);
+		armLocation = sweepOut(sweepArmLeft, sweepArmRight);
 		prev_time = curr_time;
 	}
 }
