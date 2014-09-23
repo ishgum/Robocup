@@ -40,7 +40,7 @@ void WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
 		armLocation = sweepIn(sweepArmLeft, sweepArmRight);
 		prev_time = curr_time;
 	}
-	//if(not_collected()){
+	//if(not_collected() && ARMS_IN){
 	//	wait;
 	//}
 	if(delta_ms>SPEED_MS && armLocation==ARMS_IN){
@@ -52,7 +52,18 @@ Serial.print("\t::");
 }
 
 void WaveArm::knockOver(){
-	
+	//if(whisker_detect && left_bumber){
+                //knock_left
+        //}
+        //if(whisker_detect && right_bumber){
+                //knock_right
+        //}
+        //if(right_bumper && notWhisker_detect)
+                //getouttathere
+        //}
+        //if(left_bumper && notWhisker_detect)
+                //getouttathere
+        //}
 }
 
 bool WaveArm::collected(void){
