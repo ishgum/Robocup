@@ -55,9 +55,9 @@ void WISR(void)
 
 void loop() 
 {
-
-sweeperArms.collect(sweepArmLeft, sweepArmRight);
-whisker.detect();
+        if(whisker.detect()){
+                sweeperArms.collect(sweepArmLeft, sweepArmRight);
+        }
 
 } 
 

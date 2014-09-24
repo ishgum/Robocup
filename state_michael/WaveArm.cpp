@@ -34,21 +34,20 @@ bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
 void WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
-	curr_time = millis();
+ 	curr_time = millis();
 	delta_ms = (curr_time-prev_time);
 	if(delta_ms>SPEED_MS && armLocation==ARMS_OUT){
 		armLocation = sweepIn(sweepArmLeft, sweepArmRight);
 		prev_time = curr_time;
 	}
-	//if(not_collected() && ARMS_IN){
-	//	wait;
-	//}
-	if(delta_ms>SPEED_MS && armLocation==ARMS_IN){
+	else if(collected()==false && ARMS_IN){
+	}else{
+	//if(delta_ms>SPEED_MS && armLocation==ARMS_IN){
 		armLocation = sweepOut(sweepArmLeft, sweepArmRight);
 		prev_time = curr_time;
 	}
-Serial.print("\t::");
-        Serial.println(angle);
+	Serial.print("angle: ");
+	Serial.println(armLocation);
 }
 
 void WaveArm::knockOver(){
@@ -67,5 +66,15 @@ void WaveArm::knockOver(){
 }
 
 bool WaveArm::collected(void){
-
+        collector = analogRead(A3);
+        if(collector == 0){
+          result = false;
+        }else{
+          result = true;
+        }
+        
+        Serial.print("     col?: ");
+	Serial.println(result);
+        
+        return result;
 }

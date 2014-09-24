@@ -1,6 +1,6 @@
 
-#ifndef WaveArm_h
-#define WaveArm_h
+#ifndef WAVEARM_h
+#define WAVEARM_h
 
 #include "Arduino.h"
 
@@ -34,7 +34,9 @@ class WaveArm{
 		unsigned long prev_time;
 		unsigned long delta_ms;
 		int armLocation = 0;
-                bool temp_dir;		
+                bool temp_dir;
+                int collector;
+                bool result = false;		
 };
 
 #endif
