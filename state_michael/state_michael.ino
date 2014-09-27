@@ -15,6 +15,9 @@
 #include "WaveArm.h"
 #include "Servo.h"
 #include "Whisker.h"
+#include "schedule.h"
+#include "Switch.h"
+
 
 volatile unsigned long tick = 0;
 Servo sweepArmLeft;   
@@ -22,6 +25,7 @@ Servo sweepArmRight;
 WaveArm sweeperArms; 
 
 Whisker whisker;
+schedule collectorArms;
 
 void setup() 
 { 
@@ -41,6 +45,9 @@ void setup()
   
 	sweepArmLeft.attach(11); 
 	sweepArmRight.attach(10); 
+     
+        Switch powerSwitch(A3);
+        powerSwitch.Init();
 
 } 
 

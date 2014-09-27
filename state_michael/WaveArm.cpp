@@ -66,7 +66,7 @@ void WaveArm::knockOver(){
 }
 
 bool WaveArm::collected(void){
-        collector = analogRead(A3);
+        collector = analogRead(A2);
         if(collector == 0){
           result = false;
         }else{
