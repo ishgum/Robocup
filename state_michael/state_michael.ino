@@ -29,7 +29,10 @@ Whisker whisker;
 schedule collectorArms(6);
 schedule gate(3);
 Switch powerSwitch(A3);
+Switch collectorSwitch(A4);//????????
 Gate frontGate;
+
+bool collect_trigger = false;
 
 void setup() 
 { 
@@ -40,37 +43,34 @@ void setup()
 	TCCR1A = 0x00; //normal operation mode
 	TCCR1B = 0x03; //64x prescale for 250kHz clock
 	TCNT1=0x0000; //16bit counter register initialised to 0
-
-//        TCCR2A = 0x00; //normal mode
-//        TCCR2B = 0x04; //64 prescale for 1ms overflow rate
-//        TCNT2 = 0x0000; //Zero it
-//        TIMSK2 = (1<<TOIE2); //interrupt on TCNT2 overflow
   sei(); 
   
 	sweepArmLeft.attach(11); 
 	sweepArmRight.attach(10); 
         gateServo.attach(3);//?????????
         powerSwitch.Init();
+        collectorSwitch.Init();
 
 } 
+
 
 void WISR(void)
 {
     whisker.count++;
 }
 
-//ISR(TIMER2_OVF_VECT){
-//   tick++; 
-//}
 
 void loop() 
 {
         if(powerSwitch.on()){
                 if(whisker.detect()){
-                        sweeperArms.collect(sweepArmLeft, sweepArmRight);
+                        collect_trigger = true;
+                }
+                if(collect_trigger){
+                        collect_trigger = sweeperArms.collect(sweepArmLeft, sweepArmRight); 
                 }
         }else{
         }
 }
-//need knockover and gate modules
+//need knockover modules
 

@@ -18,7 +18,8 @@ bool Whisker::detect (){;
 	sei();
 	deltaTime = time - lastTime; //time difference between last poll
 	if(deltaTime == 0){ //-ve if overflow and no NaN
-		return -1;
+		Serial.println("Divide by 0 error in whisker");
+                return -1;
 	}else{
 		freqRead = (pulses*CONV)/deltaTime; 
 	}

@@ -6,6 +6,7 @@
 #include "Gate.h"
 #include "Servo.h"
 #include "schedule.h"
+#include "Switch.h"
 
 #define CONV 250000
 #define MOVING_IN 1
@@ -23,6 +24,7 @@
 
 extern Gate frontGate;
 extern schedule collectorArms;
+extern Switch collectorSwitch;
 
 class WaveArm{
   
@@ -46,7 +48,7 @@ class WaveArm{
                 bool temp_dir;
                 int collector;
                 bool result = false;
-                bool collecting;
+                bool collecting = true;
                 bool gate_down;		
 };
 

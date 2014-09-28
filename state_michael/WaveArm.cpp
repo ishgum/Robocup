@@ -9,6 +9,7 @@ WaveArm::WaveArm(void)
         angleLeftArm = 0;
 }
 
+
 bool WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
 	if(angleLeftArm < ANGLE_MAX && angleRightArm < ANGLE_MAX){
 		sweepArmLeft.write(angleLeftArm);
@@ -21,6 +22,7 @@ bool WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
 	}
     return temp_dir;
 }
+
 
 bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 	if(angleLeftArm > ANGLE_MIN && angleRightArm > ANGLE_MIN){
@@ -39,8 +41,10 @@ bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
     return temp_dir;
 }
 
+
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
 bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
+       bool collect_trigger = true; 
        if(collectorArms.ready()){
                 if(collecting){
                         if(gate_down){
@@ -52,16 +56,14 @@ bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
                         gate_down = frontGate.raiseGate();   //put 'em up
                         if(gate_down == false){                              //gate up
                                 collecting = true; //reset for next time
-                                return true; 
+                                collect_trigger = false; 
                         }
                 }
         }
-//	Serial.print("angle: ");
-//	Serial.println(armLocation);
 }
 
 bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){
-        bool collecting = false;
+        bool collecting = true;
         if(armLocation == MOVING_IN){
                 armLocation = sweepIn(sweepArmLeft, sweepArmRight);
         }
@@ -73,24 +75,19 @@ bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){
         if(armLocation == MOVING_OUT){
                 armLocation = sweepOut(sweepArmLeft, sweepArmRight);
                 if(armLocation == MOVING_IN){
-                      collecting = true;
+                      collecting = false;
                 }
         }
         return collecting;
 }
 
 bool WaveArm::collected(void){
-        collector = analogRead(A2);
-        if(collector == 0){
-                result = false;
-        }else{
-                result = true;
+        bool collected = false;
+        if(collectorSwitch.on()){
+                collected = true;
         }
         
-        Serial.print("     col?: ");
-	Serial.println(result);
-        
-        return result;
+        return collected;
 }
 
 
