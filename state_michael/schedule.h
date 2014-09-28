@@ -3,7 +3,7 @@
 
 class schedule{
 	public:
-		schedule(void);
+		schedule(int delayTime);
 		bool ready(void);
 
 	private:

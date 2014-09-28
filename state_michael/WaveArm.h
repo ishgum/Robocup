@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include "Gate.h"
 #include "Servo.h"
+#include "schedule.h"
 
 #define CONV 250000
 #define MOVING_IN 1
@@ -12,8 +13,7 @@
 #define WAITING 2
 #define ANGLE_MAX 180
 #define ANGLE_MIN 0
-#define SPEED_MS 10
-#define SWEEP_OUT_DELAY 10
+#define SWEEP_OUT_DELAY 10 //degrees
 
         //extern volatile unsigned long tick;
 
@@ -22,6 +22,7 @@
   Detection of weights within robot */
 
 extern Gate frontGate;
+extern schedule collectorArms;
 
 class WaveArm{
   

@@ -1,8 +1,8 @@
 #include "schedule.h"
 #include "Arduino.h"
 
-schedule::schedule(void){
-	delay_time;
+schedule::schedule(int delayTime){
+	delay_time = delayTime;
 	current_time = 0;
 	prev_time = 0;
 	progress = false;

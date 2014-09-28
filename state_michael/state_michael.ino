@@ -22,11 +22,12 @@
 
 volatile unsigned long tick = 0;
 Servo sweepArmLeft;   
-Servo sweepArmRight;    
+Servo sweepArmRight;
+Servo gateServo;
 WaveArm sweeperArms; 
-
 Whisker whisker;
-schedule collectorArms;
+schedule collectorArms(6);
+schedule gate(3);
 Switch powerSwitch(A3);
 Gate frontGate;
 
@@ -48,6 +49,7 @@ void setup()
   
 	sweepArmLeft.attach(11); 
 	sweepArmRight.attach(10); 
+        gateServo.attach(3);//?????????
         powerSwitch.Init();
 
 } 

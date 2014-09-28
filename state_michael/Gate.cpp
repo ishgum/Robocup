@@ -5,9 +5,23 @@ Gate::Gate(void){
 }
 
 bool Gate::lowerGate(void){
-  return false;
+  if(angle > ANGLE_MIN){
+    gateServo.write(angle);
+    angle -= 1;
+    gate_down = false;
+  }else{
+    gate_down = true;
+  }
+  return gate_down;
 }
 
 bool Gate::raiseGate(void){
-  return false;
+  if(angle < ANGLE_MAX){
+    gateServo.write(angle);
+    angle += 1;
+    gate_down = true;
+  }else{
+    gate_down = false;
+  }
+  return gate_down;
 }
