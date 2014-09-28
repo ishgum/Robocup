@@ -26,8 +26,8 @@ Servo sweepArmRight;
 Servo gateServo;
 WaveArm sweeperArms; 
 Whisker whisker;
-schedule collectorArms(6);
-schedule gate(3);
+schedule collectorArms(6); //ms between each degree of movement
+schedule gate(4);
 Switch powerSwitch(A3);
 Switch collectorSwitch(A4);//????????
 Gate frontGate;
