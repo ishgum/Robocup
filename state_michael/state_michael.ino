@@ -26,6 +26,7 @@ WaveArm sweeperArms;
 
 Whisker whisker;
 schedule collectorArms;
+Switch powerSwitch(A3);
 
 void setup() 
 { 
@@ -45,8 +46,6 @@ void setup()
   
 	sweepArmLeft.attach(11); 
 	sweepArmRight.attach(10); 
-     
-        Switch powerSwitch(A3);
         powerSwitch.Init();
 
 } 
@@ -62,9 +61,12 @@ void WISR(void)
 
 void loop() 
 {
-        if(whisker.detect()){
-                sweeperArms.collect(sweepArmLeft, sweepArmRight);
+        if(powerSwitch.on()){
+                if(whisker.detect()){
+                        sweeperArms.collect(sweepArmLeft, sweepArmRight);
+                }
+        }else{
         }
-
-} 
+}
+//need knockover and gate modules
 

@@ -16,7 +16,7 @@ void Switch::Init (void){
 
 // Updates a single sensor using a MAF
 
-bool Switch::updateSwitch (void) {
+bool Switch::on (void) {
   if (analogRead(port) != 0) {
      offCount = 0;
      onCount += 1;

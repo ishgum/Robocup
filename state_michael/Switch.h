@@ -15,7 +15,7 @@ class Switch
 {
 	public:
 		Switch (int inputPort);
-		bool updateSwitch(void);
+		bool on(void);
                 void Init(void);
 	private:
 		int port;
