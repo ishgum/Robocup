@@ -1,6 +1,5 @@
-#include "Servo.h"
 #include "WaveArm.h"
-#include "Gate.h"
+
 /* Functions to move the sweeper arms */
 
 
@@ -11,25 +10,29 @@ WaveArm::WaveArm(void)
 }
 
 bool WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
-	if(angle<ANGLE_MAX){
-		sweepArmLeft.write(angle);
-		sweepArmRight.write(ANGLE_MAX - angle);
-		angle += 1;
-                temp_dir = ARMS_OUT;
+	if(angleLeftArm<ANGLE_MAX && angleRightArm<ANGLE_MAX){
+		sweepArmLeft.write(angleLeftArm);
+                sweepArmRight.write(180 - angleRightArm);
+		angleLeftArm += 1;
+		angleRightArm += 1;
+                temp_dir = MOVING_IN;
 	}else{
-		temp_dir = ARMS_IN;
+		temp_dir = MOVING_OUT;
 	}
     return temp_dir;
 }
 
 bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
-	if(angle>ANGLE_MIN){
-		sweepArmLeft.write(angle);
-		sweepArmRight.write(ANGLE_MAX - angle);
-		angle -= 1;
-                temp_dir = ARMS_IN;
+	if(angleLeftArm>ANGLE_MIN && angleRightArm>ANGLE_MIN){
+		sweepArmLeft.write(angleLeftArm);
+                sweepArmRight.write(angleRightArm);
+		angleLeftArm-= 1;
+                if(angleLeftArm<=170){
+                        angleRightArm = angleLeftArm + SWEEP_OUT_DELAY;
+                }
+                temp_dir = MOVING_OUT;
 	}else{
-		temp_dir = ARMS_OUT;
+		temp_dir = MOVING_IN;
 	}
     return temp_dir;
 }
@@ -42,12 +45,12 @@ bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
         if(delta_ms >= SPEED_MS){
                 if(collecting){
                         if(gate_down){
-                                collecting = sweep(); //when finished, not_collecting
+                                collecting = sweep(sweepArmLeft, sweepArmRight); //when finished, not_collecting
                         }else{
-                                gate_down = gate.lowerGate();
+                                gate_down = frontGate.lowerGate();
                         }
                 }else{ //not_collecting
-                        gate_down = raiseGate();   //put 'em up
+                        gate_down = frontGate.raiseGate();   //put 'em up
                         if(gate_down == false){                              //gate up
                                 collecting = true; //reset for next time
                                 return true; 
@@ -58,15 +61,15 @@ bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
 //	Serial.println(armLocation);
 }
 
-bool WaveArm::sweep(void){
+bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){
         if(armLocation == MOVING_IN){
-          //keep doing that
+          armLocation = sweepIn(sweepArmLeft, sweepArmRight);
         }
         if(armLocation == WAITING){
          //wait until collected 
         }        
         if(armLocation == MOVING_OUT){
-         //keep doing that 
+         armLocation = sweepOut(sweepArmLeft, sweepArmRight);
         }
 }
 

@@ -11,6 +11,7 @@
 #define SWITCH_OFF 0
 #define SWITCH_ON 1
 
+
 class Switch
 {
 	public:

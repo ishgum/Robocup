@@ -17,6 +17,7 @@
 #include "Whisker.h"
 #include "schedule.h"
 #include "Switch.h"
+#include "Gate.h"
 
 
 volatile unsigned long tick = 0;
@@ -27,6 +28,7 @@ WaveArm sweeperArms;
 Whisker whisker;
 schedule collectorArms;
 Switch powerSwitch(A3);
+Gate frontGate;
 
 void setup() 
 { 
