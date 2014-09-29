@@ -12,9 +12,9 @@
 #define MOVING_IN 1
 #define MOVING_OUT 0
 #define WAITING 2
-#define ANGLE_MAX 180
-#define ANGLE_MIN 0
-#define SWEEP_OUT_DELAY 10 //degrees
+#define ANGLE_OUT 180
+#define ANGLE_IN 0
+#define SWEEP_OUT_DELAY 30 //degrees
 
         //extern volatile unsigned long tick;
 
@@ -24,6 +24,7 @@
 
 extern Gate frontGate;
 extern schedule collectorArms;
+extern schedule gate;
 extern Switch collectorSwitch;
 
 class WaveArm{
@@ -33,14 +34,13 @@ class WaveArm{
                 bool collect(Servo sweepArmLeft, Servo sweepArmRight);        
                 bool sweep(Servo sweepArmLeft, Servo sweepArmRight);
                 
-                unsigned int angleRightArm;
-                unsigned int angleLeftArm;
+                unsigned int angle;
 
-	private:
-		bool sweepIn(Servo sweepArmLeft, Servo sweepArmRight);
-		bool sweepOut(Servo sweepArmLeft, Servo sweepArmRight);
-		bool collected(void);
-
+	//private:
+		int sweepIn(Servo sweepArmLeft, Servo sweepArmRight);
+		int sweepOut(Servo sweepArmLeft, Servo sweepArmRight);
+		bool collected();
+private:
 		unsigned long curr_time;
 		unsigned long prev_time;
 		unsigned long delta_ms;

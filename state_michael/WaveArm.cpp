@@ -5,34 +5,16 @@
 
 WaveArm::WaveArm(void)
 {
-        angleRightArm = 0;
-        angleLeftArm = 0;
+        angle = 0;
 }
 
 
-bool WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
-	if(angleLeftArm < ANGLE_MAX && angleRightArm < ANGLE_MAX){
-		sweepArmLeft.write(angleLeftArm);
-                sweepArmRight.write(180 - angleRightArm);
-		angleLeftArm += 1;
-		angleRightArm += 1;
-                temp_dir = MOVING_IN;
-	}else{
-		temp_dir = WAITING;
-	}
-    return temp_dir;
-}
-
-
-bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
-	if(angleLeftArm > ANGLE_MIN && angleRightArm > ANGLE_MIN){
-		sweepArmLeft.write(angleLeftArm);
-                sweepArmRight.write(angleRightArm);
-                if(angleLeftArm > ANGLE_MIN){
-		        angleLeftArm-= 1;
-                }
-                if(angleLeftArm<=170){
-                        angleRightArm = angleLeftArm + SWEEP_OUT_DELAY;
+int WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
+	if(angle < ANGLE_OUT){
+		sweepArmLeft.write(angle);
+		angle += 1;
+                if(angle>=(SWEEP_OUT_DELAY)){
+                        sweepArmRight.write(angle - SWEEP_OUT_DELAY);
                 }
                 temp_dir = MOVING_OUT;
 	}else{
@@ -42,24 +24,44 @@ bool WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 }
 
 
+int WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
+	if(angle > ANGLE_IN){
+		sweepArmLeft.write(angle);
+                sweepArmRight.write(180-angle);
+		angle-= 1;
+                temp_dir = MOVING_IN;
+	}else{
+		temp_dir = WAITING;
+	}
+    return temp_dir;
+}
+
+
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
 bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
-       bool collect_trigger = true; 
-       if(collectorArms.ready()){
-                if(collecting){
-                        if(gate_down){
-                                collecting = sweep(sweepArmLeft, sweepArmRight); //when finished, not_collecting
-                        }else{
-                                gate_down = frontGate.lowerGate();
-                        }
-                 }else{ //not_collecting
-                        gate_down = frontGate.raiseGate();   //put 'em up
-                        if(gate_down == false){                              //gate up
-                                collecting = true; //reset for next time
-                                collect_trigger = false; 
-                        }
-                }
-        }
+  sweepIn(sweepArmLeft, sweepArmRight);
+  return 1;
+//       bool collect_trigger = true; 
+//       Serial.print("\tCol? ");
+//       Serial.println(collecting);
+//                if(collecting){
+//                        if(gate_down && collectorArms.ready()){
+//                                collecting = sweep(sweepArmLeft, sweepArmRight); //when finished, not_collecting
+//                        }else{
+//                                if(gate.ready()){
+//                                      gate_down = frontGate.lowerGate();
+//                                }
+//                        }
+//                 }else{ //not_collecting
+//                        if(gate.ready()){
+//                               gate_down = frontGate.raiseGate();   //put 'em up
+//                        }
+//                        if(gate_down == false){                              //gate up
+//                                collecting = true; //reset for next time
+//                                collect_trigger = false; 
+//                        }
+//                }
+        
 }
 
 bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){

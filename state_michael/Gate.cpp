@@ -5,7 +5,7 @@ Gate::Gate(void){
 }
 
 
-bool Gate::lowerGate(void){
+bool Gate::raiseGate(void){
   if(angle > ANGLE_MIN){
     gateServo.write(angle);
     angle -= 1;
@@ -17,7 +17,7 @@ bool Gate::lowerGate(void){
 }
 
 
-bool Gate::raiseGate(void){
+bool Gate::lowerGate(void){
   if(angle < ANGLE_MAX){
     gateServo.write(angle);
     angle += 1;

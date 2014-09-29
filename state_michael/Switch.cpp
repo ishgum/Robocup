@@ -7,12 +7,9 @@ Switch::Switch(int inputPort)
   onCount = 0;
   offCount = 0;
   switchState = SWITCH_OFF;
+  pinMode(port, INPUT);
 }
 
-
-void Switch::Init (void){
-  pinMode(port, INPUT); 
-}
 
 // Updates a single sensor using a MAF
 

@@ -29,10 +29,20 @@ Whisker whisker;
 schedule collectorArms(6); //ms between each degree of movement
 schedule gate(4);
 Switch powerSwitch(A3);
-Switch collectorSwitch(A4);//????????
+Switch collectorSwitch(A4);
 Gate frontGate;
 
 bool collect_trigger = false;
+int ct;
+
+/*
+**gate 13
+**right knocker 11
+**right sweeper 10
+**frontIR servo 12
+**left knocker 8 //broken cable?
+**left sweeper 9
+*/
 
 void setup() 
 { 
@@ -45,11 +55,16 @@ void setup()
 	TCNT1=0x0000; //16bit counter register initialised to 0
   sei(); 
   
-	sweepArmLeft.attach(11); 
+	sweepArmLeft.attach(9); 
 	sweepArmRight.attach(10); 
-        gateServo.attach(3);//?????????
+        //gateServo.attach(13);
         powerSwitch.Init();
         collectorSwitch.Init();
+        
+        //get them in a nice position
+        sweepArmLeft.write(180);
+        sweepArmRight.write(0);
+        //gateServo.write(90);
 
 } 
 
@@ -64,10 +79,13 @@ void loop()
 {
         if(powerSwitch.on()){
                 if(whisker.detect()){
-                        collect_trigger = true;
-                }
-                if(collect_trigger){
-                        collect_trigger = sweeperArms.collect(sweepArmLeft, sweepArmRight); 
+                        //collect_trigger = true;
+                        ct = sweeperArms.sweepIn(sweepArmLeft, sweepArmRight);
+                }else{
+                        //if(collect_trigger){
+                          //      Serial.print(collect_trigger);
+                                ct= sweeperArms.sweepOut(sweepArmLeft, sweepArmRight); 
+                        //}
                 }
         }else{
         }

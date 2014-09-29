@@ -17,7 +17,6 @@ class Switch
 	public:
 		Switch (int inputPort);
 		bool on(void);
-                void Init(void);
 	private:
 		int port;
 		int onCount;
