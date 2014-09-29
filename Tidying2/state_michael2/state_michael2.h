@@ -19,6 +19,8 @@
 #define SENSOR_MIDDLE 105
 #define SENSOR_ANGLE 30
 
+#define WALL_FOLLOW_DISTANCE 350
+
 // Peripherals
 
   Servo frontSensor;
@@ -47,8 +49,8 @@
   State driveState(STATE_STRAIGHT);
   State followState(STATE_LEFT_WALL);
 
-  PID leftError;
-  PID rightError;
+  PID leftError(WALL_FOLLOW_DISTANCE);
+  PID rightError(WALL_FOLLOW_DISTANCE);
   Switch powerSwitch(3);
   
   Arm leftArm(LEFT_SIDE, 0);

@@ -1,7 +1,7 @@
 
 #include "PID.h"
 
-PID::PID(void)
+PID::PID(int desired)
 {
   desiredValue = 0;
   sweepDirection = 0;

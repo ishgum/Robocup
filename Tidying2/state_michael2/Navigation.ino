@@ -1,8 +1,6 @@
 
 #include "State.h"
 
-
-#define FOLLOW_DISTANCE 350
 #define STOP_DISTANCE_FRONT 400
 #define STOP_DISTANCE_SIDES 400
 
@@ -18,12 +16,13 @@ void updateErrors (void) {
 
 
 // If the sensor reads a wall within a certain distance it will change the state to turning
-void findTurn (Sensors sensor, int distance) {
+Sensors findTurn (Sensors sensor, int distance) {
   sensor.ignore = true;
   if (sensor.findWall(distance)) {
     changeToTurnState();
     sensor.ignore = false;
   }
+  return sensor;
 }
 
 
@@ -39,7 +38,7 @@ void findStraight (Sensors sensor, int distance) {
 // Implements the findTurn and findStraight functions 
 void navigateCorner (void) {
    if (driveState.returnState() == STATE_STRAIGHT) {
-      findTurn(infaFront, STOP_DISTANCE_FRONT);
+      infaFront = findTurn(infaFront, STOP_DISTANCE_FRONT);
     }
   else if (driveState.returnState() == STATE_TURNING) {
       findStraight(infaFront, GO_DISTANCE_FRONT); 
@@ -51,9 +50,9 @@ void navigateCorner (void) {
 // Avoids walls using all three distance sensors
 void avoidWall (void) {
     if (driveState.returnState() == STATE_STRAIGHT) {
-      findTurn(infaFront, STOP_DISTANCE_FRONT);
-      findTurn(infaLeft, STOP_DISTANCE_SIDES);
-      findTurn(infaRight, STOP_DISTANCE_SIDES);
+      infaFront = findTurn(infaFront, STOP_DISTANCE_FRONT);
+      infaLeft = findTurn(infaLeft, STOP_DISTANCE_SIDES);
+      infaRight = findTurn(infaRight, STOP_DISTANCE_SIDES);
     }
     else if (driveState.returnState() == STATE_TURNING) {
       findStraight(infaFront, GO_DISTANCE_FRONT); 
@@ -71,7 +70,7 @@ void navigateRobot (void) {
       changeToSearchingState();
     break;
   
-    case STATE_WALL_FOLLOW: 
+    case STATE_WALL_FOLLOW:
       updateErrors();
       navigateCorner();
     break;
@@ -84,6 +83,6 @@ void navigateRobot (void) {
       changeToSearchingState(); 
     break;
   }
-  driveRobot(driveState, leftError.error);
+  driveRobot(driveState, leftError.error/3);
 }
 
