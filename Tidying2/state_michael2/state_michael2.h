@@ -8,7 +8,7 @@
 #include "PID.h"
 #include "Switch.h"
 #include "Whisker.h"
-#include "WaveArm.h"
+#include "Arm.h"
 #include "Motors.h"
 
 /**** SET UP ****/
@@ -24,12 +24,13 @@
   Servo frontSensor;
   Servo leftWheel;
   Servo rightWheel;
-  Servo leftWing;
-  Servo rightWing;
-  Servo leftArm;
-  Servo rightArm;
   
-  Servo ramp;
+  Servo leftWingServo;
+  Servo rightWingServo;
+  Servo leftArmServo;
+  Servo rightArmServo;
+  
+  Servo gateServo;
   
   
   Whisker whisker;
@@ -50,8 +51,9 @@
   PID rightError;
   Switch powerSwitch(3);
   
-  
-  WaveArm detector;
+  Arm leftArm(LEFT_SIDE, 0);
+  Arm rightArm (RIGHT_SIDE, 180);
+  Arm gateArm(RIGHT_SIDE, 90);
 
 // State things
 

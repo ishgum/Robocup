@@ -2,7 +2,7 @@
 #include "State.h"
 
 
-#define FOLLOW_DISTANCE 250
+#define FOLLOW_DISTANCE 350
 #define STOP_DISTANCE_FRONT 400
 #define STOP_DISTANCE_SIDES 400
 
@@ -12,19 +12,18 @@
 
 // Updates errors for the left and right sensors, allowing PID control to be implemented
 void updateErrors (void) {
-    rightError.findError(infaRight.filteredRead, FOLLOW_DISTANCE);
-    leftError.findError(infaLeft.filteredRead, FOLLOW_DISTANCE);
+    rightError.findError(infaRight.filteredRead);
+    leftError.findError(infaLeft.filteredRead);
 }
 
 
 // If the sensor reads a wall within a certain distance it will change the state to turning
-Sensors findTurn (Sensors sensor, int distance) {
+void findTurn (Sensors sensor, int distance) {
   sensor.ignore = true;
   if (sensor.findWall(distance)) {
     changeToTurnState();
     sensor.ignore = false;
   }
-  return sensor;
 }
 
 
@@ -40,7 +39,7 @@ void findStraight (Sensors sensor, int distance) {
 // Implements the findTurn and findStraight functions 
 void navigateCorner (void) {
    if (driveState.returnState() == STATE_STRAIGHT) {
-      infaFront = findTurn(infaFront, STOP_DISTANCE_FRONT);
+      findTurn(infaFront, STOP_DISTANCE_FRONT);
     }
   else if (driveState.returnState() == STATE_TURNING) {
       findStraight(infaFront, GO_DISTANCE_FRONT); 
@@ -52,9 +51,9 @@ void navigateCorner (void) {
 // Avoids walls using all three distance sensors
 void avoidWall (void) {
     if (driveState.returnState() == STATE_STRAIGHT) {
-      infaFront = findTurn(infaFront, STOP_DISTANCE_FRONT);
-      infaLeft = findTurn(infaLeft, STOP_DISTANCE_SIDES);
-      infaRight = findTurn(infaRight, STOP_DISTANCE_SIDES);
+      findTurn(infaFront, STOP_DISTANCE_FRONT);
+      findTurn(infaLeft, STOP_DISTANCE_SIDES);
+      findTurn(infaRight, STOP_DISTANCE_SIDES);
     }
     else if (driveState.returnState() == STATE_TURNING) {
       findStraight(infaFront, GO_DISTANCE_FRONT); 
@@ -79,14 +78,12 @@ void navigateRobot (void) {
   
     case STATE_SEARCHING: 
       avoidWall();
-      fullStop();
-      //state.updateNavigationState(ALIGNING); 
     break;
   
     case STATE_COLLECTING:
       changeToSearchingState(); 
     break;
   }
-  driveRobot(driveState, leftError.error/3);
+  driveRobot(driveState, leftError.error);
 }
 

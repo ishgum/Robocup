@@ -7,7 +7,7 @@
 #include "Adafruit_TCS34725.h"
 #include "state_michael2.h"
 
-  
+bool collect_trigger = false;
   
 void setup() {
   Serial.begin(9600);
@@ -20,21 +20,23 @@ void setup() {
   leftWheel.attach(6);  // S11 (on port S6)
   rightWheel.attach(7); // S12 (on port S6)
   
-  leftWing.attach(11);
-  rightWing.attach(8);
-  leftArm.attach(10);
-  rightArm.attach(9);
-  ramp.attach(13);
+  leftWingServo.attach(11);
+  rightWingServo.attach(8);
+  leftArmServo.attach(10);
+  rightArmServo.attach(9);
+  gateServo.attach(13);
   
   initColourView();
  
   
   //WHISKER STUFF
-  attachInterrupt(0, WISR, FALLING); //enable interrupt0 (pin2)
+    cli();
+  attachInterrupt(5, WISR, FALLING); //enable interrupt0 (pin2)
   pinMode(2, INPUT);
   TCCR1A = 0x00; //normal operation mode
   TCCR1B = 0x03; //64x prescale for 250kHz clock
   TCNT1=0x0000; //16bit counter register initialised to 0
+  sei(); 
   
   tick = 0;
   
@@ -89,6 +91,12 @@ void updateSensors (void) {
   infaBottom.updateSensor();
 }
 
+void sweepAll (void) {
+  leftArm.sweep(leftArmServo);
+  rightArm.sweep(rightArmServo);
+  gateArm.sweep(gateServo);
+}
+
 
 // Updates the error for the angle as well as for the wall following
 
@@ -109,30 +117,25 @@ void determineWallFollow (void) {
 void loop() {
   
   checkPowerSwitch();
+  sweepAll();
   
   switch (powerState.returnState()) {
     case STATE_ON:
     updateSensors();
-    if (tick % 10) {
+    findWeights();
+    if (tick % 100 == 0) {
       checkColour();
     }
-    if (tick % 4) {
+    if (tick % 4 == 0) {
       navigateRobot();
-      leftArm.write(0);
-      rightArm.write(180);
-      ramp.write(80);
-      leftWheel.write(leftValue);
-      rightWheel.write(rightValue);
     }
   break;
   
   case STATE_OFF:
-    fullStop();
-    ramp.write(160);
-    delay(100);
-    leftArm.write(130);
-     rightArm.write(50);
-      
+    fullStop();   
+    leftArm.setDesiredAngle(0);
+    rightArm.setDesiredAngle(0);
+    gateArm.setDesiredAngle(110); 
   break;
   }
   tick++;

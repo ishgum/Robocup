@@ -18,16 +18,14 @@ void Sensors::updateSensor () {
 	_currentRead = analogRead(_port);
 	_filterArray[_index] = _currentRead;
 	
-	unsigned int temp_sum = 0;
-	for (int i = 0; i < SENSOR_FILTER_SIZE; i++)
+	_index++;
+	if (_index == (SENSOR_FILTER_SIZE)) {
+            unsigned int temp_sum = 0;
+            for (int i = 0; i < SENSOR_FILTER_SIZE; i++)
 	{
 		temp_sum += _filterArray[i];
 	}
-	
-	filteredRead = temp_sum / SENSOR_FILTER_SIZE;
-	
-	_index++;
-	if (_index == (SENSOR_FILTER_SIZE)) {
+            filteredRead = temp_sum / SENSOR_FILTER_SIZE;
 		_index = 0;
 	}
 }

@@ -62,6 +62,8 @@ void driveRobot (State state, int straightError) {
     turn();
   } 
   checkClipping();
+  leftWheel.write(leftValue);
+  rightWheel.write(rightValue);
 }
 
 
@@ -101,3 +103,4 @@ void setTurnDir (int newDir) {
   }
 }
   
+

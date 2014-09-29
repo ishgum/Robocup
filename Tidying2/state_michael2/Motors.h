@@ -11,8 +11,8 @@
 #define MOTOR_FORWARDS 1
 #define MOTOR_BACKWARDS -1
 
-#define MOTOR_CW -1
-#define MOTOR_CCW 1
+#define MOTOR_CW 1
+#define MOTOR_CCW -1
 
 
 #endif

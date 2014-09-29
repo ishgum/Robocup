@@ -9,7 +9,7 @@ class PID
 {
 	public:
 		PID (void);
-                float findError (float currentValue, float desired);
+                float findError (float currentValue);
                 void setDesiredValue(float newValue);
                 void scaleError(signed int scale);
                 float currentDesiredValue(void);

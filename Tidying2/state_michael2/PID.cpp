@@ -13,9 +13,9 @@ PID::PID(void)
 
 // Updates a single sensor using a MAF
 
-float PID::findError (float currentValue, float desired) {
+float PID::findError (float currentValue) {
   if (ignore == false) {
-    error = desired - currentValue;
+    error = desiredValue - currentValue;
   }
 }
 
