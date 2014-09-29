@@ -8,10 +8,6 @@
 #define GO_DISTANCE_SIDES 150
 
 
-// Updates errors for the left and right sensors, allowing PID control to be implemented
-void updateErrors (void) {
-    rightError.findError(infaRight.filteredRead);
-    leftError.findError(infaLeft.filteredRead);
 
 void navigateRobot (void) {
   switch (navigationState.returnState()) {
@@ -34,7 +30,7 @@ void navigateRobot (void) {
   
     case STATE_SEARCHING: 
       avoidWall();
-      if(whisker.detect(SLOW)){
+      if(whisker.detect()){
         waving = false;
         fullStop();
         //state.updateNavigationState(ALIGNING); 

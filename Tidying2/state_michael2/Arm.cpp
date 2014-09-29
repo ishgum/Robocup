@@ -13,7 +13,7 @@ Arm::Arm(bool input_loc, int defaultAngle)
 }
 
 
-void Arm::setDesiredAngle (int newAngle) {
+void Arm::setDesiredAngle (int newAngle, int speed_ms) {
   if (moving == false) {
   desiredAngle = newAngle;
   }

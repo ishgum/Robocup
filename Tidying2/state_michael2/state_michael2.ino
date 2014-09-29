@@ -126,15 +126,14 @@ void loop() {
   
   switch (powerState.returnState()) {
     case STATE_ON:
-    updateSensors();
-    findWeights();
-    if (tick % 100 == 0) {
-      checkColour();
-      }
-    }
-    if (tick % 4 == 0) {
-      navigateRobot();
-    }
+       updateSensors();
+       findWeights();
+       if (micros() % 100 == 0) {
+          checkColour();
+       }
+       if (micros() % 4 == 0) {
+          navigateRobot();
+       }
   break;
   
   case STATE_OFF:
@@ -144,7 +143,6 @@ void loop() {
     gateArm.setDesiredAngle(110); 
   break;
   }
-  tick++;
 }
 
 
