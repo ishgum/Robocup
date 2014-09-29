@@ -10,7 +10,6 @@ WaveArm::WaveArm(bool input_loc, int input_angle_in, int input_angle_out)
         angle_out = input_angle_out;
         angle = 0;
         angle_right = 0;
-        dir = MOVING_IN;
 }
 
 
@@ -53,45 +52,7 @@ bool WaveArm::sweepIn(Servo sweeper){
 }
 
 
-                //lower gate
-                //sweepin
-                //wait
-                //sweepout
-                //raisegate
-bool WaveArm::collect(){
-         bool collected = false;
-         if(dir = MOVING_IN){
-           
-                 if(gate_down == false && gate.ready()){
-                         gate_down = sweepIn(gateServo);
-                 }
-                 if(gate_down == true && collectorArms.ready()){
-                        sweepIn(sweepArmLeft);
-                        arms_in = sweepIn(sweepArmRight);
-                        if(arms_in == true){
-                                dir = WAITING;
-                        }
-                 } 
-         }
-         if(dir == WAITING){
-                 //wait for collected trigger
-                 dir = MOVING_OUT;
-         }
-         if(dir = MOVING_OUT){
-                 if(arms_in == true && collectorArms.ready()){
-                         sweepOut(sweepArmLeft);
-                         arms_in != sweepOut(sweepArmRight);
-                 }
-                 if(arms_in == false && gate.ready()){
-                         gate_down != sweepOut(gateServo);
-                         if(gate_down == false){
-                                 dir == MOVING_IN;
-                                 collected = true;
-                         }  
-                 }
-         }
-         return collected;
-}
+
 //int WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 //	if(angle < ANGLE_OUT || angle_right < ANGLE_OUT){
 //                if(angle < ANGLE_OUT){

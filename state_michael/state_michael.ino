@@ -20,6 +20,11 @@
 #include "Gate.h"
 
 
+                int dir;
+                bool arms_in;
+                bool gate_down;	
+
+
 volatile unsigned long tick = 0;
 Servo sweepArmLeft;   
 Servo sweepArmRight;
@@ -45,6 +50,46 @@ int ct;
 **left knocker 8 //broken cable?
 **left sweeper 9
 */
+
+                //lower gate
+                //sweepin
+                //wait
+                //sweepout
+                //raisegate
+bool collect(){
+         bool collected = false;
+         if(dir = MOVING_IN){
+           
+                 if(gate_down == false && gate.ready()){
+                         gate_down = frontGate.sweepIn(gateServo);
+                 }
+                 if(gate_down == true && collectorArms.ready()){
+                        sweeperArmLeft.sweepIn(sweepArmLeft);
+                        arms_in = sweeperArmRight.sweepIn(sweepArmRight);
+                        if(arms_in == true){
+                                dir = WAITING;
+                        }
+                 } 
+         }
+         if(dir == WAITING){
+                 //wait for collected trigger
+                 dir = MOVING_OUT;
+         }
+         if(dir = MOVING_OUT){
+                 if(arms_in == true && collectorArms.ready()){
+                         sweeperArmLeft.sweepOut(sweepArmLeft);
+                         arms_in != sweeperArmRight.sweepOut(sweepArmRight);
+                 }
+                 if(arms_in == false && gate.ready()){
+                         gate_down != frontGate.sweepOut(gateServo);
+                         if(gate_down == false){
+                                 dir == MOVING_IN;
+                                 collected = true;
+                         }  
+                 }
+         }
+         return collected;
+}
 
 void setup() 
 { 
@@ -83,7 +128,7 @@ void loop()
                         collect_trigger = true;
                 }
                 if(collect_trigger == true){
-                       //  collect();
+                         collect_trigger != collect();
                 }
         }else{
                 sweepArmLeft.write(180);

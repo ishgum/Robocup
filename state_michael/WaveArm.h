@@ -36,7 +36,7 @@ class WaveArm{
   
 	public:
 		WaveArm (bool input_loc, int input_angle_in, int input_angle_out);
-                bool collect(void);        
+                //bool collect(void);        
                 bool sweep(Servo sweepArmLeft, Servo sweepArmRight);
                 
                 unsigned int angle;
@@ -55,13 +55,11 @@ private:
                 int collector;
                 bool result = false;
                 bool collecting = true;
-                bool gate_down;	
                 int angle_out;
                 int angle_in;
                 bool loc;
                 Servo sweeper;
-                int dir;
-                bool arms_in;	
+	
 };
 
 #endif
