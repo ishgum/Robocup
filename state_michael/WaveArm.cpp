@@ -13,6 +13,7 @@ WaveArm::WaveArm(bool input_loc, int input_angle_in, int input_angle_out)
         dir = MOVING_IN;
 }
 
+
 bool WaveArm::sweepOut(Servo sweeper){
        bool full_out = false;
        if(angle < angle_out){
@@ -30,6 +31,7 @@ bool WaveArm::sweepOut(Servo sweeper){
        }
        return full_out;
 }
+
 
 bool WaveArm::sweepIn(Servo sweeper){
        bool full_in = false;
