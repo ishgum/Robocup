@@ -48,8 +48,8 @@ void changeToSearchingState (void) {
 
 
 void changeToWallFollowState (void) {
-  leftError.setDesiredValue(FOLLOW_DISTANCE);
-  rightError.setDesiredValue(FOLLOW_DISTANCE);
+  leftError.setDesiredValue(WALL_FOLLOW_DISTANCE);
+  rightError.setDesiredValue(WALL_FOLLOW_DISTANCE);
   navigationState.updateState(STATE_WALL_FOLLOW);
 }
 

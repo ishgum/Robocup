@@ -83,6 +83,6 @@ void navigateRobot (void) {
       changeToSearchingState(); 
     break;
   }
-  driveRobot(driveState, leftError.error/3);
+  driveRobot(driveState, leftError.error/5);
 }
 

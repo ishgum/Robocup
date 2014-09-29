@@ -3,7 +3,7 @@
 
 PID::PID(int desired)
 {
-  desiredValue = 0;
+  desiredValue = desired;
   sweepDirection = 0;
   error = 0;
   scaledError = 0;
