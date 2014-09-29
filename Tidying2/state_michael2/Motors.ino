@@ -42,7 +42,7 @@ void checkClipping(void) {
 void straight (signed int error) {
   leftValue = MOTOR_ZERO_VALUE + motorDir*(motorSpeed + followState.returnState()*error);
   rightValue = MOTOR_ZERO_VALUE + motorDir*(motorSpeed - followState.returnState()*error);
-  Serial.print(leftValue); Serial.print('\t'); Serial.println(rightValue);
+  //Serial.print(leftValue); Serial.print('\t'); Serial.println(rightValue);
 }
 
 // Turns the robot

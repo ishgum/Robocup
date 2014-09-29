@@ -14,7 +14,7 @@
 class Switch
 {
 	public:
-		Switch (int port);
+		Switch (int port,  int defaultOff);
 		void updateSwitch();
                 
                 int switchState;
@@ -22,7 +22,7 @@ class Switch
 		int _port;
 		int _onCount;
 		int _offCount;
-	
+	        int defaultOff;
     
 };
 

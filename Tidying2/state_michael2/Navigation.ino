@@ -8,10 +8,26 @@
 #define GO_DISTANCE_SIDES 150
 
 
+// Updates the error for the angle as well as for the wall following
+
+Sensors determineWallFollow (void) {
+    
+  if (infaLeft.filteredRead <= infaRight.filteredRead) {
+    followState.updateState(STATE_RIGHT_WALL);
+    setTurnDir(MOTOR_CCW);
+    return infaRight;
+  }
+  if (infaLeft.filteredRead > infaRight.filteredRead) {
+    followState.updateState(STATE_LEFT_WALL);
+    setTurnDir(MOTOR_CW);
+    return infaLeft;
+  }
+}
+
+
 // Updates errors for the left and right sensors, allowing PID control to be implemented
 void updateErrors (void) {
-    rightError.findError(infaRight.filteredRead);
-    leftError.findError(infaLeft.filteredRead);
+    currentError.findError(currentSensor.filteredRead);
 }
 
 
@@ -83,6 +99,6 @@ void navigateRobot (void) {
       changeToSearchingState(); 
     break;
   }
-  driveRobot(driveState, leftError.error/5);
+  driveRobot(driveState, currentError.error/5);
 }
 

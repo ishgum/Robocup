@@ -55,10 +55,9 @@ void initRobot(void) {
   setMotorDir(MOTOR_FORWARDS);
   
   updateSensors();
-  determineWallFollow();
+  currentSensor = determineWallFollow();
   setHomeColour();
   frontSensor.write(SENSOR_MIDDLE);
-  waving = true;
   
 }
 
@@ -67,6 +66,7 @@ void initRobot(void) {
 
 void checkPowerSwitch() {
   powerSwitch.updateSwitch();
+  limitRamp.updateSwitch();
   
   switch (powerSwitch.switchState) {
     case SWITCH_ON:
@@ -89,6 +89,8 @@ void updateSensors (void) {
   infaLeft.updateSensor();
   infaRight.updateSensor();
   infaBottom.updateSensor();
+  
+  currentSensor.updateSensor();
 }
 
 void sweepAll (void) {
@@ -98,26 +100,16 @@ void sweepAll (void) {
 }
 
 
-// Updates the error for the angle as well as for the wall following
-
-void determineWallFollow (void) {
-    
-  if (infaLeft.filteredRead <= infaRight.filteredRead) {
-    followState.updateState(STATE_RIGHT_WALL);
-    setTurnDir(MOTOR_CCW);
-  }
-  if (infaLeft.filteredRead > infaRight.filteredRead) {
-    followState.updateState(STATE_LEFT_WALL);
-    setTurnDir(MOTOR_CW);
-  }
-}
-
 
 
 void loop() {
   
   checkPowerSwitch();
   sweepAll();
+  //Serial.println(analogRead(10));
+  if (powerSwitch.switchState == 0) {
+    Serial.println("Switched");
+  }
   
   switch (powerState.returnState()) {
     case STATE_ON:

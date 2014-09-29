@@ -42,6 +42,8 @@
   Sensors infaLeft(0);
   Sensors infaRight(1);
   Sensors infaBottom(2);
+  
+  Sensors currentSensor(10);
 
 
   State powerState(STATE_OFF);
@@ -51,17 +53,17 @@
 
   PID leftError(WALL_FOLLOW_DISTANCE);
   PID rightError(WALL_FOLLOW_DISTANCE);
-  Switch powerSwitch(3);
+  PID currentError(WALL_FOLLOW_DISTANCE);
+  
+  Switch powerSwitch(3, 0);
+  
+  Switch limitRamp(10, 400);
   
   Arm leftArm(LEFT_SIDE, 0);
   Arm rightArm (RIGHT_SIDE, 180);
   Arm gateArm(RIGHT_SIDE, 90);
 
-// State things
-
-bool waving = true; //won't lose it here//////////////////////////////
-bool centred = false;
-  
+// State things  
   
  int leftValue = MOTOR_ZERO_VALUE;
 int rightValue = MOTOR_ZERO_VALUE;
