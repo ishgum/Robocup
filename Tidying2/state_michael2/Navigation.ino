@@ -8,6 +8,7 @@
 #define GO_DISTANCE_SIDES 150
 
 
+<<<<<<< HEAD
 // Updates the error for the angle as well as for the wall following
 
 Sensors determineWallFollow (void) {
@@ -28,6 +29,42 @@ Sensors determineWallFollow (void) {
 // Updates errors for the left and right sensors, allowing PID control to be implemented
 void updateErrors (void) {
     currentError.findError(currentSensor.filteredRead);
+=======
+
+void navigateRobot (void) {
+  switch (navigationState.returnState()) {
+      
+    case STATE_EVACUATE:
+      changeToSearchingState();
+    break;
+  
+    case STATE_WALL_FOLLOW: 
+      updateErrors();
+      navigateCorner();
+      determineWallFollow();
+      if (followState.returnState() == STATE_LEFT_WALL) {
+      driveRobot(driveState, leftError.error/5);
+      }
+      if (followState.returnState() == STATE_RIGHT_WALL) {
+      driveRobot(driveState, rightError.error/5);
+      }
+    break;
+  
+    case STATE_SEARCHING: 
+      avoidWall();
+      if(whisker.detect()){
+        waving = false;
+        fullStop();
+        //state.updateNavigationState(ALIGNING); 
+      }
+      //detector.waveArm(waving, detectorArm, tick);
+    break;
+  
+    case STATE_COLLECTING:
+      changeToSearchingState(); 
+    break;
+  }
+>>>>>>> origin/master
 }
 
 
@@ -44,7 +81,7 @@ Sensors findTurn (Sensors sensor, int distance) {
 
 // If the robot is turning, and the sensor reads that the wall is no longer within a certain distance, the robot will begin moving straight
 void findStraight (Sensors sensor, int distance) {
-  if (!sensor.findWall(distance) && sensor.ignore == false) {
+  if (!sensor.findWall(distance)) {
     changeToStraightState();
   }
 }

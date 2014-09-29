@@ -26,9 +26,10 @@ void setup() {
   rightArmServo.attach(9);
   gateServo.attach(13);
   
+  Serial.println("Got here");
   initColourView();
  
-  
+  Serial.println("Got here");
   //WHISKER STUFF
     cli();
   attachInterrupt(5, WISR, FALLING); //enable interrupt0 (pin2)
@@ -39,6 +40,9 @@ void setup() {
   sei(); 
   
   tick = 0;
+  
+  leftError.setDesiredValue(300);
+  rightError.setDesiredValue(300);
   
 }
 
@@ -90,7 +94,10 @@ void updateSensors (void) {
   infaRight.updateSensor();
   infaBottom.updateSensor();
   
+<<<<<<< HEAD
   currentSensor.updateSensor();
+=======
+>>>>>>> origin/master
 }
 
 void sweepAll (void) {
@@ -113,14 +120,14 @@ void loop() {
   
   switch (powerState.returnState()) {
     case STATE_ON:
-    updateSensors();
-    findWeights();
-    if (tick % 100 == 0) {
-      checkColour();
-    }
-    if (tick % 4 == 0) {
-      navigateRobot();
-    }
+       updateSensors();
+       findWeights();
+       if (micros() % 100 == 0) {
+          checkColour();
+       }
+       if (micros() % 4 == 0) {
+          navigateRobot();
+       }
   break;
   
   case STATE_OFF:
@@ -130,7 +137,6 @@ void loop() {
     gateArm.setDesiredAngle(110); 
   break;
   }
-  tick++;
 }
 
 

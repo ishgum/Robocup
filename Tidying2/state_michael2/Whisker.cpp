@@ -28,7 +28,7 @@ bool Whisker::detect (){;
 
 	filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + freqRead;
 	freq = filter_reg >> FILTER_SHIFT;
-        //Serial.println(freq);
+//Serial.println(freq);
 	if (freq < DETECT_THRESHOLD){
 		object = true;    
 	}

@@ -14,7 +14,12 @@ Switch::Switch(int port, int inputDefaultOff)
 // Updates a single sensor using a MAF
 
 void Switch::updateSwitch () {
+<<<<<<< HEAD
    if (analogRead(_port) > defaultOff) {
+=======
+ 
+   if (analogRead(_port) != 0) {
+>>>>>>> origin/master
      _offCount = 0;
      _onCount += 1;
   }
