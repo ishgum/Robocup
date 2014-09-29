@@ -25,7 +25,9 @@
   Control for knockover arms (?)
   Detection of weights within robot */
 
-extern Gate frontGate;
+extern Servo gateServo;
+extern Servo sweepArmLeft;
+extern Servo sweepArmRight;
 extern schedule collectorArms;
 extern schedule gate;
 extern Switch collectorSwitch;
@@ -33,16 +35,16 @@ extern Switch collectorSwitch;
 class WaveArm{
   
 	public:
-		WaveArm (Servo input_sweeper, bool input_loc, int input_angle_in, int input_angle_out);
-                bool collect(Servo sweepArmLeft, Servo sweepArmRight);        
+		WaveArm (bool input_loc, int input_angle_in, int input_angle_out);
+                bool collect(void);        
                 bool sweep(Servo sweepArmLeft, Servo sweepArmRight);
                 
                 unsigned int angle;
                 unsigned int angle_right;
 
 	//private:
-		bool sweepIn(void);
-		bool sweepOut(void);
+		bool sweepIn(Servo sweeper);
+		bool sweepOut(Servo sweeper);
 		bool collected();
 private:
 		unsigned long curr_time;
@@ -57,7 +59,9 @@ private:
                 int angle_out;
                 int angle_in;
                 bool loc;
-                Servo sweeper;	
+                Servo sweeper;
+                int dir;
+                bool arms_in;	
 };
 
 #endif

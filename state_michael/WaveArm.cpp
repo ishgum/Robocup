@@ -3,17 +3,17 @@
 /* Functions to move the sweeper arms */
 
 
-WaveArm::WaveArm(Servo input_sweeper, bool input_loc, int input_angle_in, int input_angle_out)
+WaveArm::WaveArm(bool input_loc, int input_angle_in, int input_angle_out)
 {
-        sweeper = input_sweeper;
         loc = input_loc;
         angle_in = input_angle_in;
         angle_out = input_angle_out;
         angle = 0;
         angle_right = 0;
+        dir = MOVING_IN;
 }
 
-bool WaveArm::sweepOut(void){
+bool WaveArm::sweepOut(Servo sweeper){
        bool full_out = false;
        if(angle < angle_out){
               angle += 1;
@@ -31,11 +31,11 @@ bool WaveArm::sweepOut(void){
        return full_out;
 }
 
-bool WaveArm::sweepIn(void){
-  bool full_in = false;
- if(angle > angle_in){
-  angle -= 1;
- }
+bool WaveArm::sweepIn(Servo sweeper){
+       bool full_in = false;
+       if(angle > angle_in){
+       angle -= 1;
+       }
  if(angle == angle_in){
    full_in = true;
  }
@@ -50,6 +50,45 @@ bool WaveArm::sweepIn(void){
  return full_in;
 }
 
+
+                //lower gate
+                //sweepin
+                //wait
+                //sweepout
+                //raisegate
+bool WaveArm::collect(){
+         bool collected = false;
+         if(dir = MOVING_IN){
+                 if(gate_down == false){
+                         gate_down = sweepIn(gateServo);
+                 }
+                 if(gate_down == true){
+                        sweepIn(sweepArmLeft);
+                        arms_in = sweepIn(sweepArmRight);
+                        if(arms_in == true){
+                                dir = WAITING;
+                        }
+                 } 
+         }
+         if(dir == WAITING){
+                 //wait for collected trigger
+                 dir = MOVING_OUT;
+         }
+         if(dir = MOVING_OUT){
+                 if(arms_in == true){
+                         sweepOut(sweepArmLeft);
+                         arms_in != sweepOut(sweepArmRight);
+                 }
+                 if(arms_in == false){
+                         gate_down != sweepOut(gateServo);
+                         if(gate_down == false){
+                                 dir == MOVING_IN;
+                                 collected = true;
+                         }  
+                 }
+         }
+         return collected;
+}
 //int WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
 //	if(angle < ANGLE_OUT || angle_right < ANGLE_OUT){
 //                if(angle < ANGLE_OUT){
@@ -83,7 +122,7 @@ bool WaveArm::sweepIn(void){
 
 
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
-bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
+//bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
   //sweepIn(sweepArmLeft, sweepArmRight);
   //return 1;
 //       bool collect_trigger = true; 
@@ -107,7 +146,7 @@ bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
 //                        }
 //                }
         
-}
+//}
 
 //bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){
 //        bool collecting = true;
