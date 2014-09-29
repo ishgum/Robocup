@@ -1,6 +1,7 @@
 
 
 #include "Adafruit_TCS34725.h"
+#include "state_michael2.h"
 
 //
 //#define redpin 3
@@ -15,9 +16,13 @@
 #define AREA_HOME 1
 #define AREA_ENEMY 2
 
+#define EXPECTED_BOTTOM 200
+#define DISTANCE_TOLERANCE 20
+
 
 Adafruit_TCS34725 tcs;
 static int homeColour;
+
 
 uint16_t colour, red, green, blue;
 
@@ -41,21 +46,20 @@ void initColourView() {
 
 
 
-
 void findColour(void)
 {
   tcs.setInterrupt(false);      // turn on LED
-
   delay(60);  // takes 50ms to read 
-  
   tcs.getRawData(&red, &green, &blue, &colour);
-
-  tcs.setInterrupt(true);  // turn off LED
-  
+  tcs.setInterrupt(true);  // turn off LED 
 }
 
 
 void detectBase(void) {
+  if (abs(infaBottom.filteredRead - EXPECTED_BOTTOM) > DISTANCE_TOLERANCE) {
+    area = AREA_ARENA;
+  }
+  
   if (colour < COLOUR_BLACK) {
     area = AREA_ARENA;
   }

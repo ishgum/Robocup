@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define SENSOR_FILTER_SIZE 8
+#define SENSOR_FILTER_SIZE 4
 
 class Sensors
 {

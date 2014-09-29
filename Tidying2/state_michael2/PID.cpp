@@ -4,7 +4,6 @@
 PID::PID(void)
 {
   desiredValue = 0;
-  desiredSweep = 0;
   sweepDirection = 0;
   error = 0;
   scaledError = 0;
@@ -14,9 +13,9 @@ PID::PID(void)
 
 // Updates a single sensor using a MAF
 
-float PID::findError (float currentValue) {
+float PID::findError (float currentValue, float desired) {
   if (ignore == false) {
-    error = (desiredValue + desiredSweep) - currentValue;
+    error = desired - currentValue;
   }
 }
 

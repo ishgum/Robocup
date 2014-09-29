@@ -9,14 +9,13 @@ class PID
 {
 	public:
 		PID (void);
-                float findError (float currentValue);
+                float findError (float currentValue, float desired);
                 void setDesiredValue(float newValue);
                 void scaleError(signed int scale);
                 float currentDesiredValue(void);
                 float error;
                 float scaledError;
                 float desiredValue;
-                float desiredSweep;
                 bool ignore;
                 int sweepDirection;
 	private:

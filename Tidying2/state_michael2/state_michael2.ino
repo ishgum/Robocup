@@ -1,69 +1,12 @@
 
+
 #include <Servo.h> 
 #include <Wire.h>
 #include <FreeSixIMU.h>
 #include <HMC5883L.h>
 #include "Adafruit_TCS34725.h"
+#include "state_michael2.h"
 
-
-#include "Sensors.h"
-#include "State.h"
-#include "PID.h"
-#include "Switch.h"
-#include "Whisker.h"
-#include "WaveArm.h"
-#include "Motors.h"
-
-
-/**** SET UP ****/
-
-
-#define DIGITAL_OUT_POWER 49
-
-
-#define SENSOR_MIDDLE 105
-#define SENSOR_ANGLE 30
-
-
-
-// Peripherals
-
-  Servo frontSensor;
-  Servo leftWheel;
-  Servo rightWheel;
-  Servo detectorArm;
-  
-  
-  Whisker whisker;
-  
-  
-  Sensors infaFront(4);
-  Sensors infaLeft(0);
-  Sensors infaRight(1);
-
-
-  State powerState(STATE_OFF);
-  State navigationState(STATE_WALL_FOLLOW);
-  State driveState(STATE_STRAIGHT);
-  State followState(STATE_LEFT_WALL);
-
-  PID leftError;
-  PID rightError;
-  Switch powerSwitch(3);
-  
-  
-  WaveArm detector;
-
-// State things
-
-bool waving = true; //won't lose it here//////////////////////////////
-bool centred = false;
-  
-// RTOS
-  
-unsigned long long tick;  
- /**** Program ****/
-  
   
   
 void setup() {
@@ -73,10 +16,15 @@ void setup() {
   pinMode(DIGITAL_OUT_POWER, OUTPUT); 
   digitalWrite(DIGITAL_OUT_POWER, 1);
 
-  frontSensor.attach(10);
-  detectorArm.attach(11);
-  leftWheel.attach(12);  // S11 (on port S6)
-  rightWheel.attach(13); // S12 (on port S6)
+  frontSensor.attach(12);
+  leftWheel.attach(6);  // S11 (on port S6)
+  rightWheel.attach(7); // S12 (on port S6)
+  
+  leftWing.attach(11);
+  rightWing.attach(8);
+  leftArm.attach(10);
+  rightArm.attach(9);
+  ramp.attach(13);
   
   initColourView();
  
@@ -132,26 +80,17 @@ void checkPowerSwitch() {
 }
 
 
-
-
-
 // Updates the front, left and right infa-red sensors
 
 void updateSensors (void) {
   infaFront.updateSensor();
   infaLeft.updateSensor();
   infaRight.updateSensor();
+  infaBottom.updateSensor();
 }
 
 
 // Updates the error for the angle as well as for the wall following
-
-void updateErrors (void) {
-    rightError.findError(infaRight.filteredRead);
-    leftError.findError(infaLeft.filteredRead);
-}
-
-
 
 void determineWallFollow (void) {
     
@@ -167,26 +106,33 @@ void determineWallFollow (void) {
 
 
 
-
-
-
 void loop() {
   
   checkPowerSwitch();
   
   switch (powerState.returnState()) {
     case STATE_ON:
-    if (tick % 50) {
-      updateSensors();
+    updateSensors();
+    if (tick % 10) {
       checkColour();
     }
-    if (tick % 100) {
+    if (tick % 4) {
       navigateRobot();
+      leftArm.write(0);
+      rightArm.write(180);
+      ramp.write(80);
+      leftWheel.write(leftValue);
+      rightWheel.write(rightValue);
     }
   break;
   
   case STATE_OFF:
     fullStop();
+    ramp.write(160);
+    delay(100);
+    leftArm.write(130);
+     rightArm.write(50);
+      
   break;
   }
   tick++;
