@@ -16,7 +16,7 @@
 #define AREA_HOME 1
 #define AREA_ENEMY 2
 
-#define EXPECTED_BOTTOM 200
+#define EXPECTED_BOTTOM 500
 #define DISTANCE_TOLERANCE 20
 
 
@@ -56,7 +56,7 @@ void findColour(void)
 
 
 void detectBase(void) {
-  if (abs(infaBottom.filteredRead - EXPECTED_BOTTOM) > DISTANCE_TOLERANCE) {
+  if (abs(infaBottom.filteredRead - EXPECTED_BOTTOM) < DISTANCE_TOLERANCE) {
     area = AREA_ARENA;
   }
   
@@ -69,6 +69,7 @@ void detectBase(void) {
   else if (colour < MAX_COLOUR) {
     area = AREA_ENEMY;
   }
+  Serial.println(area);
 }
 
 

@@ -106,20 +106,16 @@ void loop() {
   
   checkPowerSwitch();
   sweepAll();
-  //Serial.println(analogRead(10));
-  if (powerSwitch.switchState == 0) {
-    Serial.println("Switched");
-  }
   
   switch (powerState.returnState()) {
     case STATE_ON:
-    updateSensors();
-    findWeights();
+    //updateSensors();
+    //findWeights();
     if (tick % 100 == 0) {
       checkColour();
     }
     if (tick % 4 == 0) {
-      navigateRobot();
+      //navigateRobot();
     }
   break;
   
