@@ -3,44 +3,89 @@
 /* Functions to move the sweeper arms */
 
 
-WaveArm::WaveArm(void)
+WaveArm::WaveArm(Servo input_sweeper, bool input_loc, int input_angle_in, int input_angle_out)
 {
+        sweeper = input_sweeper;
+        loc = input_loc;
+        angle_in = input_angle_in;
+        angle_out = input_angle_out;
         angle = 0;
+        angle_right = 0;
 }
 
-
-int WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
-	if(angle < ANGLE_OUT){
-		sweepArmLeft.write(angle);
-		angle += 1;
-                if(angle>=(SWEEP_OUT_DELAY)){
-                        sweepArmRight.write(angle - SWEEP_OUT_DELAY);
-                }
-                temp_dir = MOVING_OUT;
-	}else{
-		temp_dir = MOVING_IN;
-	}
-    return temp_dir;
+bool WaveArm::sweepOut(void){
+       bool full_out = false;
+       if(angle < angle_out){
+              angle += 1;
+       }
+       if(angle = angle_out){
+              full_out = true; 
+       }
+       Serial.println(angle);
+ 
+       if(loc == LEFT_SIDE){      
+               sweeper.write(angle);
+       }else{
+               sweeper.write(180-angle);
+       }
+       return full_out;
 }
 
-
-int WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
-	if(angle > ANGLE_IN){
-		sweepArmLeft.write(angle);
-                sweepArmRight.write(180-angle);
-		angle-= 1;
-                temp_dir = MOVING_IN;
-	}else{
-		temp_dir = WAITING;
-	}
-    return temp_dir;
+bool WaveArm::sweepIn(void){
+  bool full_in = false;
+ if(angle > angle_in){
+  angle -= 1;
+ }
+ if(angle == angle_in){
+   full_in = true;
+ }
+ Serial.print("sweepOut ");
+ Serial.println(angle);
+ 
+ if(loc == LEFT_SIDE){
+   sweeper.write(angle);
+ }else{
+   sweeper.write(180-angle);
+ }
+ return full_in;
 }
+
+//int WaveArm::sweepOut(Servo sweepArmLeft, Servo sweepArmRight){
+//	if(angle < ANGLE_OUT || angle_right < ANGLE_OUT){
+//                if(angle < ANGLE_OUT){
+//		        angle += 1;
+//                }
+//                if(angle>=(SWEEP_OUT_DELAY) && angle_right < ANGLE_OUT){
+//                        angle_right += 1;
+//                }
+//		sweepArmLeft.write(angle);
+//                sweepArmRight.write(180-(angle_right));
+//                temp_dir = MOVING_OUT;
+//	}else{
+//		temp_dir = MOVING_IN;
+//	}
+//    return temp_dir;
+//}
+//
+//
+//int WaveArm::sweepIn(Servo sweepArmLeft, Servo sweepArmRight){
+//	if(angle > ANGLE_IN){
+//		sweepArmLeft.write(angle);
+//                sweepArmRight.write(180-angle);
+//		angle-= 1;
+//                temp_dir = MOVING_IN;
+//	}else{
+//                angle_right = 0;
+//		temp_dir = WAITING;
+//	}
+//    return temp_dir;
+//}
 
 
 //250kHz clock input is in ms delay between movement 6 optimal, 3 max
 bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
-  sweepIn(sweepArmLeft, sweepArmRight);
-  return 1;
+  //sweepIn(sweepArmLeft, sweepArmRight);
+  //return 1;
 //       bool collect_trigger = true; 
 //       Serial.print("\tCol? ");
 //       Serial.println(collecting);
@@ -64,32 +109,38 @@ bool WaveArm::collect(Servo sweepArmLeft, Servo sweepArmRight){
         
 }
 
-bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){
-        bool collecting = true;
-        if(armLocation == MOVING_IN){
-                armLocation = sweepIn(sweepArmLeft, sweepArmRight);
-        }
-        if(armLocation == WAITING){
-          //wait until collected 
-                delay(1000);
-                armLocation = MOVING_OUT;
-        }        
-        if(armLocation == MOVING_OUT){
-                armLocation = sweepOut(sweepArmLeft, sweepArmRight);
-                if(armLocation == MOVING_IN){
-                      collecting = false;
-                }
-        }
-        return collecting;
-}
+//bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){
+//        bool collecting = true;
+//        if(armLocation == MOVING_IN){
+//                armLocation = sweepIn(sweepArmLeft, sweepArmRight);
+//        }
+//        if(armLocation == WAITING){
+//          //wait until collected 
+//                delay(1000);
+//                armLocation = MOVING_OUT;
+//        }        
+//        if(armLocation == MOVING_OUT){
+//                armLocation = sweepOut(sweepArmLeft, sweepArmRight);
+//                if(armLocation == MOVING_IN){
+//                      collecting = false;
+//                }
+//        }
+//        return collecting;
+//}
 
-bool WaveArm::collected(void){
-        bool collected = false;
-        if(collectorSwitch.on()){
-                collected = true;
-        }
-        
-        return collected;
-}
-
+//bool WaveArm::collected(void){
+//        bool collected = false;
+//        if(collectorSwitch.on()){
+//                collected = true;
+//        }
+//        
+//        return collected;
+//}
+//
+//
+//
+//bool WaveArm::sweep(Servo sweepArmLeft, Servo sweepArmRight){
+//        sweepArmLeft.write(angle);
+//        return collecting;
+//}
 

@@ -24,7 +24,8 @@ volatile unsigned long tick = 0;
 Servo sweepArmLeft;   
 Servo sweepArmRight;
 Servo gateServo;
-WaveArm sweeperArms; 
+WaveArm sweeperArmLeft(sweepArmLeft, LEFT_SIDE, 0, 180); //loc ain aout
+WaveArm sweeperArmRight(sweepArmRight, RIGHT_SIDE, 0, 180);
 Whisker whisker;
 schedule collectorArms(6); //ms between each degree of movement
 schedule gate(4);
@@ -58,8 +59,6 @@ void setup()
 	sweepArmLeft.attach(9); 
 	sweepArmRight.attach(10); 
         //gateServo.attach(13);
-        powerSwitch.Init();
-        collectorSwitch.Init();
         
         //get them in a nice position
         sweepArmLeft.write(180);
@@ -77,17 +76,27 @@ void WISR(void)
 
 void loop() 
 {
+  tick++;
         if(powerSwitch.on()){
                 if(whisker.detect()){
-                        //collect_trigger = true;
-                        ct = sweeperArms.sweepIn(sweepArmLeft, sweepArmRight);
+                  ct = sweeperArmLeft.sweepIn();
+//                        collect_trigger = true;
+//                }
+//                if(collect_trigger == true){
+//                        if (collectorArms.ready()) {
+//                                ct = sweeperArmLeft.sweepIn(sweepArmLeft);
+//                        
+//                                //ct = sweeperArmLeft.sweepOut(sweepArmLeft);
+//                                if(ct == 1){
+//                                  collect_trigger = false;
+//                                }
+//                        }
                 }else{
-                        //if(collect_trigger){
-                          //      Serial.print(collect_trigger);
-                                ct= sweeperArms.sweepOut(sweepArmLeft, sweepArmRight); 
-                        //}
+                   ct = sweeperArmLeft.sweepOut();
                 }
         }else{
+                sweepArmLeft.write(180);
+                sweepArmRight.write(0);
         }
 }
 //need knockover modules

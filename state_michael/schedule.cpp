@@ -10,11 +10,8 @@ schedule::schedule(int delayTime){
 }
 
 bool schedule::ready(void){
-	current_time = millis();
-	delta_time = current_time - prev_time;
-	if(delta_time > delay_time){
-                prev_time = current_time;
-		progress = true;
+	if(millis()%delay_time == 0){
+		progress = true;                 
 	}else{
 		progress = false;
 	}
