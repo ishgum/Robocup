@@ -22,7 +22,7 @@ class Arm
 {  
 	public:
 		Arm (bool input_loc, int defaultAngle);
-                void setDesiredAngle (int newAngle);
+                void setDesiredAngle (int newAngle, int speed_ms);
                 void sweep(Servo armServo);
                 
 		bool moving;
