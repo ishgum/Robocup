@@ -59,10 +59,11 @@ bool WaveArm::sweepIn(Servo sweeper){
 bool WaveArm::collect(){
          bool collected = false;
          if(dir = MOVING_IN){
-                 if(gate_down == false){
+           
+                 if(gate_down == false && gate.ready()){
                          gate_down = sweepIn(gateServo);
                  }
-                 if(gate_down == true){
+                 if(gate_down == true && collectorArms.ready()){
                         sweepIn(sweepArmLeft);
                         arms_in = sweepIn(sweepArmRight);
                         if(arms_in == true){
@@ -75,11 +76,11 @@ bool WaveArm::collect(){
                  dir = MOVING_OUT;
          }
          if(dir = MOVING_OUT){
-                 if(arms_in == true){
+                 if(arms_in == true && collectorArms.ready()){
                          sweepOut(sweepArmLeft);
                          arms_in != sweepOut(sweepArmRight);
                  }
-                 if(arms_in == false){
+                 if(arms_in == false && gate.ready()){
                          gate_down != sweepOut(gateServo);
                          if(gate_down == false){
                                  dir == MOVING_IN;

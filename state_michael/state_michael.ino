@@ -83,9 +83,7 @@ void loop()
                         collect_trigger = true;
                 }
                 if(collect_trigger == true){
-                        if (collectorArms.ready()) {
-                              //  collect();
-                        }
+                       //  collect();
                 }
         }else{
                 sweepArmLeft.write(180);
