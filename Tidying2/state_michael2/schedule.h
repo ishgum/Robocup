@@ -5,7 +5,6 @@ class schedule{
 	public:
 		schedule(int delayTime);
 		bool ready(void);
-                bool millisDelay(int DelayTime);
 
 	private:
 		unsigned long current_time;

@@ -1,8 +1,6 @@
 #include "schedule.h"
 #include "Arduino.h"
 
-
-
 schedule::schedule(int delayTime){
 	delay_time = delayTime;
 	current_time = 0;
@@ -19,5 +17,3 @@ bool schedule::ready(void){
 	}
 	return progress;
 }
-
-

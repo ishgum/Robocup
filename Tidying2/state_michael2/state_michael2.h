@@ -10,7 +10,6 @@
 #include "Whisker.h"
 #include "Arm.h"
 #include "Motors.h"
-#include "schedule.h"
 
 /**** SET UP ****/
 
@@ -43,6 +42,7 @@
   Sensors infaLeft(0);
   Sensors infaRight(1);
   Sensors infaBottom(7);
+  Sensors infaBelly(6);
   
   Sensors currentSensor(10);
 

@@ -16,8 +16,8 @@
 #define AREA_HOME 1
 #define AREA_ENEMY 2
 
-#define EXPECTED_BOTTOM 300
-#define DISTANCE_TOLERANCE 20
+#define EXPECTED_BOTTOM 420
+#define DISTANCE_TOLERANCE 30
 
 
 Adafruit_TCS34725 tcs;
@@ -35,8 +35,10 @@ void initColourView() {
     Serial.println("Found sensor");
   } 
   else {
+    while (!tcs.begin()) {
     Serial.println("No TCS34725 found ... check your connections");
-    while (1);
+    tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+    }
   }
   
   setHomeColour();
@@ -56,7 +58,8 @@ void findColour(void)
 
 
 void detectBase(void) {
-  if (abs(infaBottom.filteredRead - EXPECTED_BOTTOM) > DISTANCE_TOLERANCE) {
+  
+  if (abs(infaBelly.filteredRead - EXPECTED_BOTTOM) > DISTANCE_TOLERANCE) {
   }
   
   else if (colour < COLOUR_BLACK) {
@@ -75,6 +78,7 @@ void detectBase(void) {
 void setHomeColour(void) {
   findColour();
   homeColour = colour;
+  int expectedBottom = infaBelly.filteredRead;
 }
 
 

@@ -97,9 +97,10 @@ void navigateRobot (void) {
       navigateCorner();
     break;
   
-    case STATE_SEARCHING: 
+    case STATE_SEARCHING:
+      currentSensor = determineWallFollow(); 
       avoidWall();
-      findWeight();
+      //findWeight();
     break;
   
     case STATE_COLLECTING:
