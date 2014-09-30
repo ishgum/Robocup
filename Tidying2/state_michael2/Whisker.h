@@ -6,8 +6,8 @@
 #include <avr/interrupt.h>
 
 #define CONV 250000 //for 1 clock tick every 4us (250kHz clock)
-#define DETECT_THRESHOLD 4000
-#define FILTER_SHIFT 4
+#define DETECT_THRESHOLD 6900
+#define FILTER_SHIFT 6
 class Whisker
 {
 	public:

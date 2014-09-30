@@ -23,14 +23,9 @@ void Arm::setDesiredAngle (int newAngle) {
 void Arm::sweep (Servo armServo) {
   if (desiredAngle > currentAngle) {
     currentAngle += 1;
-    moving = true;
   }
   else if (desiredAngle < currentAngle) {
     currentAngle -= 1;
-    moving = true;
-  }
-  else if (desiredAngle == currentAngle) {
-    moving = false;
   }
   
   if (loc == LEFT_SIDE) {      
@@ -39,5 +34,16 @@ void Arm::sweep (Servo armServo) {
   else {
       armServo.write(180-currentAngle);
   }
+}
+
+
+bool Arm::checkMoving(void){
+  if (desiredAngle == currentAngle) {
+    moving = false;
+  }
+  else {
+    moving = true;
+  }
+  return moving;
 }
 

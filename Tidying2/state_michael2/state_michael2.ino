@@ -8,6 +8,7 @@
 #include "state_michael2.h"
 
 bool collect_trigger = false;
+bool weightCollect = false;
 
   
 void setup() {
@@ -64,10 +65,22 @@ void initRobot(void) {
 
 // Checks the state of the on switch, if the switch is on the power is supplied to the robot
 
-void checkPowerSwitch() {
+void checkSwitches() {
   powerSwitch.updateSwitch();
   limitRamp.updateSwitch();
-  //Serial.println(analogRead(10));
+  
+  switch (limitRamp.switchState) {
+    case SWITCH_ON:
+        collect_trigger = true;
+    break;
+    
+    case SWITCH_OFF:
+        if (collect_trigger) {
+            weightCollect = true;
+            collect_trigger = false;
+        }
+    break;
+  }
   
   switch (powerSwitch.switchState) {
     case SWITCH_ON:
@@ -104,9 +117,9 @@ void sweepAll (void) {
 
 void loop() {
   
-  checkPowerSwitch();
+  checkSwitches();
   sweepAll();
-  Serial.println(powerState.returnState());
+  //Serial.println(powerState.returnState());
   switch (powerState.returnState()) {
     case STATE_ON:
     updateSensors();
@@ -120,10 +133,8 @@ void loop() {
   break;
   
   case STATE_OFF:
-    fullStop();   
-    leftArm.setDesiredAngle(0);
-    rightArm.setDesiredAngle(0);
-    gateArm.setDesiredAngle(110); 
+    fullStop();
+   navigationState.updateState(STATE_SEARCHING);
   break;
   }
   tick++;

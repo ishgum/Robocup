@@ -10,14 +10,13 @@
 #define LEFT_SIDE 0
 #define RIGHT_SIDE 1
 
-
-#define LOWER 0
-#define SWEEPING_IN 1
-#define WAITING 2
-#define SWEEPING_OUT 3
-#define RAISE 4
-#define STATIC 5
-#define SWEEP1 6
+#define SWEEP1 0
+#define LOWER 1 
+#define SWEEPING_IN 2
+#define WAITING 3
+#define SWEEPING_OUT 4
+#define RAISE 5
+#define STATIC 6
 
         //extern volatile unsigned long tick;
 
@@ -33,6 +32,7 @@ class Arm
                 void setDesiredAngle (int newAngle);
                 void sweep(Servo armServo);
                 
+                bool checkMoving(void);
 		bool moving;
                 int currentAngle;
 

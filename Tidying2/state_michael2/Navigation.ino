@@ -7,6 +7,7 @@
 #define GO_DISTANCE_FRONT 200
 #define GO_DISTANCE_SIDES 150
 
+#define MAX_OBJ_DIST 300
 
 // Updates the error for the angle as well as for the wall following
 
@@ -77,6 +78,11 @@ void avoidWall (void) {
     }
 }
 
+void findWeight (void) {
+   if(!infaFront.findWall(MAX_OBJ_DIST) && infaBottom.findWall(MAX_OBJ_DIST)){
+      navigationState.updateState(STATE_HONING);
+   } 
+}
 
 // High level function which moves the robot around the arena
 void navigateRobot (void) {
@@ -93,10 +99,15 @@ void navigateRobot (void) {
   
     case STATE_SEARCHING: 
       avoidWall();
+      findWeight();
     break;
   
     case STATE_COLLECTING:
       changeToSearchingState(); 
+    break;
+    
+    case STATE_HONING:
+      fullStop();
     break;
   }
   driveRobot(driveState, currentError.error/5);

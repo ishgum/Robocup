@@ -41,13 +41,13 @@
   Sensors infaFront(4);
   Sensors infaLeft(0);
   Sensors infaRight(1);
-  Sensors infaBottom(2);
+  Sensors infaBottom(7);
   
   Sensors currentSensor(10);
 
 
   State powerState(STATE_OFF);
-  State navigationState(STATE_WALL_FOLLOW);
+  State navigationState(STATE_SEARCHING);
   State driveState(STATE_STRAIGHT);
   State followState(STATE_LEFT_WALL);
 
