@@ -114,7 +114,18 @@ void sweepAll (void) {
   gateArm.sweep(gateServo);
 }
 
-
+int startTime = 0;
+bool millisDelay (int DelayTime){
+   bool goTime = false;
+   if(startTime == 0){
+      startTime = millis(); 
+   }
+   if ((millis() - startTime) >= DelayTime){
+      goTime = true;
+     startTime = 0;
+   } 
+   return goTime;
+}
 
 void loop() {
   
@@ -129,7 +140,7 @@ void loop() {
       checkColour();
     }
     if (tick % 4 == 0) {
-      //navigateRobot();
+      navigateRobot();
     }
   break;
   

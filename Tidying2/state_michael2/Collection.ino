@@ -30,8 +30,9 @@ void collect(){
       gateArm.setDesiredAngle(50);
       
       if (gateArm.checkMoving() == false) {
-        sweep_dir = SWEEPING_IN;
-        delay(1000);
+        if(millisDelay(1000)){
+            sweep_dir = SWEEPING_IN;
+        }
       }
     break;
  
