@@ -10,6 +10,7 @@
 #include "Whisker.h"
 #include "Arm.h"
 #include "Motors.h"
+#include "schedule.h"
 
 /**** SET UP ****/
 
@@ -47,7 +48,7 @@
 
 
   State powerState(STATE_OFF);
-  State navigationState(STATE_WALL_FOLLOW);
+  State navigationState(STATE_SEARCHING);
   State driveState(STATE_STRAIGHT);
   State followState(STATE_LEFT_WALL);
 

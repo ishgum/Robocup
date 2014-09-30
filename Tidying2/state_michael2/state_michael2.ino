@@ -83,8 +83,22 @@ void checkPowerSwitch() {
 }
 
 
-// Updates the front, left and right infa-red sensors
 
+int startTime = 0;
+bool millisDelay (int DelayTime){
+   bool goTime = false;
+   if(startTime == 0){
+      startTime = millis(); 
+   }
+   if ((millis() - startTime) >= DelayTime){
+      goTime = true;
+      startTime = 0;
+   } 
+   return goTime;
+}
+
+
+// Updates the front, left and right infa-red sensors
 void updateSensors (void) {
   infaFront.updateSensor();
   infaLeft.updateSensor();

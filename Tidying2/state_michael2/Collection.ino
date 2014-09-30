@@ -1,4 +1,3 @@
-
 int sweep_dir = SWEEP1;
 
 void findWeights (void) {
@@ -18,13 +17,15 @@ void collect(){
      rightArm.setDesiredAngle(0);
      sweepAll();
      if(leftArm.moving == false && rightArm.moving == false){
-       gateArm.setDesiredAngle(110);
-       sweep_dir = LOWER;
+       gateArm.setDesiredAngle(50);
+       if(millisDelay(1000)){
+           sweep_dir = LOWER;
+       }
      }
   }
      
   else if (sweep_dir == LOWER) {   
-    gateArm.setDesiredAngle(50);
+    //gateArm.setDesiredAngle(50);
     if (gateArm.moving == false) {
       leftArm.setDesiredAngle(180);
       rightArm.setDesiredAngle(180);
