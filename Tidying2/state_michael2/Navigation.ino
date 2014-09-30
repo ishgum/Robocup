@@ -7,6 +7,7 @@
 #define GO_DISTANCE_FRONT 200
 #define GO_DISTANCE_SIDES 150
 
+#define MAX_OBJ_DIST 200
 
 // Updates the error for the angle as well as for the wall following
 
@@ -75,6 +76,14 @@ void avoidWall (void) {
       findStraight(infaLeft, GO_DISTANCE_SIDES); 
       findStraight(infaRight, GO_DISTANCE_SIDES); 
     }
+}
+
+
+void findWeight (void) {
+     changeToTurnState();
+     if(!infraFront.findWall(MAX_OBJ_DIST) && infraBottom.findWall(MAX_OBJ_DIST)){
+         motors.fullstop(); 
+     }
 }
 
 
