@@ -10,6 +10,7 @@
 #include "Whisker.h"
 #include "Arm.h"
 #include "Motors.h"
+#include "schedule.h"
 
 /**** SET UP ****/
 
