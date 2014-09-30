@@ -1,11 +1,6 @@
 
-<<<<<<< HEAD
 int sweep_dir = STATIC;
 //int originalTick = 0;
-=======
-int sweep_dir = SWEEP1;
-
->>>>>>> origin/master
 
 void findWeights (void) {
   if (whisker.detect() && sweep_dir == STATIC) {         
@@ -24,7 +19,6 @@ void collect(){
     case SWEEP1:
      leftArm.setDesiredAngle(0);
      rightArm.setDesiredAngle(0);
-<<<<<<< HEAD
      
      if(leftArm.checkMoving() == false && rightArm.checkMoving() == false){
        sweep_dir = LOWER;
@@ -47,26 +41,6 @@ void collect(){
      rightArm.setDesiredAngle(180);
         
      if(leftArm.checkMoving() == false && rightArm.checkMoving() == false){
-=======
-     sweepAll();
-     if(leftArm.moving == false && rightArm.moving == false){
-       gateArm.setDesiredAngle(50);
-       if(millisDelay(1000)){
-           sweep_dir = LOWER;
-       }           
-     }
-     
-  case LOWER:   
-    //gateArm.setDesiredAngle(50);
-    if (gateArm.moving == false) {
-      leftArm.setDesiredAngle(180);
-      rightArm.setDesiredAngle(180);
-      sweep_dir = SWEEPING_IN;
-  break;
-
-  case SWEEPING_IN:
-     if(leftArm.moving == false && rightArm.moving == false){
->>>>>>> origin/master
        sweep_dir = WAITING;
      }
      break;
@@ -107,6 +81,6 @@ void collect(){
        collect_trigger = false;
      }
      break;
+     
      }
-   }
 }
