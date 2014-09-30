@@ -52,7 +52,7 @@ void collect(){
        gateArm.setDesiredAngle(50);
        if(millisDelay(1000)){
            sweep_dir = LOWER;
-       }
+       }           
      }
   }
      
