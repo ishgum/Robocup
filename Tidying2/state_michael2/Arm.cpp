@@ -21,12 +21,13 @@ void Arm::setDesiredAngle (int newAngle) {
 
 
 void Arm::sweep (Servo armServo) {
-  moving = true;
   if (desiredAngle > currentAngle) {
     currentAngle += 1;
+    moving = true;
   }
   else if (desiredAngle < currentAngle) {
     currentAngle -= 1;
+    moving = true;
   }
   else if (desiredAngle == currentAngle) {
     moving = false;

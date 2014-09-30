@@ -8,6 +8,7 @@
 #include "state_michael2.h"
 
 bool collect_trigger = false;
+
   
 void setup() {
   Serial.begin(9600);
@@ -27,7 +28,6 @@ void setup() {
   gateServo.attach(13);
   
   initColourView();
- 
   
   //WHISKER STUFF
     cli();
@@ -53,7 +53,7 @@ void initRobot(void) {
   driveState.setToDefault();
   navigationState.setToDefault();
   setMotorDir(MOTOR_FORWARDS);
-  
+  initColourView();
   updateSensors();
   currentSensor = determineWallFollow();
   setHomeColour();
@@ -67,6 +67,7 @@ void initRobot(void) {
 void checkPowerSwitch() {
   powerSwitch.updateSwitch();
   limitRamp.updateSwitch();
+  //Serial.println(analogRead(10));
   
   switch (powerSwitch.switchState) {
     case SWITCH_ON:
@@ -101,21 +102,20 @@ void sweepAll (void) {
 
 
 
-
 void loop() {
   
   checkPowerSwitch();
   sweepAll();
-  
+  Serial.println(powerState.returnState());
   switch (powerState.returnState()) {
     case STATE_ON:
-    //updateSensors();
-    //findWeights();
+    updateSensors();
+    findWeights();
     if (tick % 100 == 0) {
       checkColour();
     }
     if (tick % 4 == 0) {
-      //navigateRobot();
+      navigateRobot();
     }
   break;
   

@@ -1,13 +1,14 @@
 
 #include "Switch.h"
 
-Switch::Switch(int port, int inputDefaultOff)
+Switch::Switch(int port, int inputDefaultOff, int inputPulse)
 {
   _port = port;
   _onCount = 0;
   _offCount = 0;
   switchState = SWITCH_OFF;
   defaultOff = inputDefaultOff;
+  pulse = inputPulse;
 }
 
 
@@ -29,7 +30,7 @@ void Switch::updateSwitch () {
   else if (_offCount == OFF_BUFFER) {
     switchState = SWITCH_OFF;
   }
-  else {
+  else if (pulse == PULSE_ON) {
     switchState = SWITCH_WAITING;
   }
 }

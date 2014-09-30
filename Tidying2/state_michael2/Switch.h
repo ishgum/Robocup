@@ -11,10 +11,13 @@
 #define SWITCH_ON 1
 #define SWITCH_WAITING 2
 
+#define PULSE_ON 0
+#define PULSE_OFF 1
+
 class Switch
 {
 	public:
-		Switch (int port,  int defaultOff);
+		Switch (int port,  int defaultOff, int inputPulse);
 		void updateSwitch();
                 
                 int switchState;
@@ -23,6 +26,7 @@ class Switch
 		int _onCount;
 		int _offCount;
 	        int defaultOff;
+                int pulse;
     
 };
 

@@ -55,10 +55,9 @@
   PID rightError(WALL_FOLLOW_DISTANCE);
   PID currentError(WALL_FOLLOW_DISTANCE);
   
-  Switch powerSwitch(3, 0);
-  
-  Switch limitRamp(10, 400);
-  
+  Switch powerSwitch(3, 0, PULSE_ON);
+  Switch limitRamp(10, 400, PULSE_OFF);
+    
   Arm leftArm(LEFT_SIDE, 0);
   Arm rightArm (RIGHT_SIDE, 180);
   Arm gateArm(RIGHT_SIDE, 90);

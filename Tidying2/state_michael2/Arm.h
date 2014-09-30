@@ -11,6 +11,14 @@
 #define RIGHT_SIDE 1
 
 
+#define LOWER 0
+#define SWEEPING_IN 1
+#define WAITING 2
+#define SWEEPING_OUT 3
+#define RAISE 4
+#define STATIC 5
+#define SWEEP1 6
+
         //extern volatile unsigned long tick;
 
 /*Control functions for both sweeper arms together
