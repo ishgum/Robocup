@@ -1,7 +1,7 @@
 #include "Whisker.h"
 
 Whisker::Whisker(void){
-	count = 0;
+	count = 3000;
 	pulses = 0;
 	lastTime = 0;
 	time = 0;
@@ -28,8 +28,8 @@ bool Whisker::detect (){;
 
 	filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + freqRead;
 	freq = filter_reg >> FILTER_SHIFT;
-        Serial.print(" ");
-        Serial.println(freq);
+        //Serial.print(" ");
+        //Serial.println(freq);
 	if (freq < DETECT_THRESHOLD){
 		object = true;    
 	}

@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#define ON_BUFFER 20
+#define ON_BUFFER 1
 #define OFF_BUFFER 10
 
 #define SWITCH_OFF 0

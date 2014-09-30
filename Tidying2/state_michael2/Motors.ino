@@ -6,6 +6,7 @@ static int turnSpeed;
 static int turnDir;
 
 
+
 void initMotors (void) {
   motorSpeed = 0;
   motorDir = MOTOR_FORWARDS;
@@ -19,7 +20,8 @@ void initMotors (void) {
 void fullStop (void) {
   leftWheel.write(MOTOR_ZERO_VALUE);
   rightWheel.write(MOTOR_ZERO_VALUE);
-  motorSpeed = 0;
+  currentError.error = 0;
+  motorsGoing = false;
 }
 
 // Ensures the value being read to the motor is not greater than the maximum
@@ -63,8 +65,10 @@ void driveRobot (State state, int straightError) {
     turn();
   } 
   checkClipping();
-  leftWheel.write(leftValue);
-  rightWheel.write(rightValue);
+  if (motorsGoing == true) {
+    leftWheel.write(leftValue);
+    rightWheel.write(rightValue);
+  }
 }
 
 

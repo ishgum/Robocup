@@ -48,7 +48,7 @@
 
 
   State powerState(STATE_OFF);
-  State navigationState(STATE_SEARCHING);
+  State navigationState(STATE_WALL_FOLLOW);
   State driveState(STATE_STRAIGHT);
   State followState(STATE_LEFT_WALL);
 
@@ -57,10 +57,14 @@
   PID currentError(WALL_FOLLOW_DISTANCE);
   
   Switch powerSwitch(3, 0, PULSE_ON);
-  Switch limitRamp(10, 400, PULSE_OFF);
+  Switch limitFront(8, 10, PULSE_OFF);
+  Switch limitRamp(9, 10, PULSE_OFF);
+  Switch limitHiFive(11, 10, PULSE_OFF);
     
   Arm leftArm(LEFT_SIDE, 0);
   Arm rightArm (RIGHT_SIDE, 180);
+  
+  Arm rightWing(LEFT_SIDE, 180);
   Arm gateArm(RIGHT_SIDE, 90);
 
 // State things  

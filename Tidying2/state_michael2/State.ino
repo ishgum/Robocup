@@ -29,6 +29,7 @@ int State::returnState (void) {
 void changeToStraightState (void) {
   frontSensor.write(SENSOR_MIDDLE);
   driveState.updateState(STATE_STRAIGHT);
+  motorsGoing = true;
 }
 
 
@@ -36,6 +37,7 @@ void changeToTurnState (void) {
   int sensorTurnAngle = SENSOR_MIDDLE + followState.returnState()*SENSOR_ANGLE;
   frontSensor.write(sensorTurnAngle);
   driveState.updateState(STATE_TURNING);
+  motorsGoing = true;
 }
 
 

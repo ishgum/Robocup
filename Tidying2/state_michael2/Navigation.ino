@@ -2,12 +2,14 @@
 #include "State.h"
 
 #define STOP_DISTANCE_FRONT 400
-#define STOP_DISTANCE_SIDES 400
+#define STOP_DISTANCE_SIDES 350
 
-#define GO_DISTANCE_FRONT 200
+#define GO_DISTANCE_FRONT 150
 #define GO_DISTANCE_SIDES 150
 
 #define MAX_OBJ_DIST 300
+
+int evacuateStep = 0;
 
 // Updates the error for the angle as well as for the wall following
 
@@ -86,10 +88,37 @@ void findWeight (void) {
 
 // High level function which moves the robot around the arena
 void navigateRobot (void) {
+  //Serial.println(navigationState.returnState());
   switch (navigationState.returnState()) {
       
     case STATE_EVACUATE:
-      changeToSearchingState();
+      if (evacuateStep == 0) {
+        fullStop();
+        //delay(1000);
+        if (tick % 1000 == 0) {
+          evacuateStep = 1;
+        }
+      }
+      
+      else if (evacuateStep == 1) {
+        changeToStraightState();
+        setMotorDir(MOTOR_BACKWARDS);
+        if (tick % 500 == 0) {
+          evacuateStep = 2;
+          setMotorDir(MOTOR_FORWARDS);
+          determineWallFollow();
+        }
+      }
+      
+      else if (evacuateStep == 2) {
+        changeToTurnState();
+        if (tick % 500 == 0) {
+          changeToSearchingState();
+          infaLeft.ignore = false;
+          infaRight.ignore = false;
+          infaFront.ignore = false;
+        }
+      }
     break;
   
     case STATE_WALL_FOLLOW:
@@ -102,6 +131,7 @@ void navigateRobot (void) {
         currentSensor = determineWallFollow(); 
       }
       avoidWall();
+      
       //findWeight();
     break;
   

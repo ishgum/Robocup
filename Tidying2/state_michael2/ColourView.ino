@@ -19,6 +19,8 @@
 #define EXPECTED_BOTTOM 460
 #define DISTANCE_TOLERANCE 40
 
+int enemyCount = 0;
+
 
 Adafruit_TCS34725 tcs;
 static int homeColour;
@@ -60,7 +62,6 @@ void findColour(void)
 void detectBase(void) {
   //Serial.print(colour); Serial.print('\t'); Serial.println(infaBelly.filteredRead);
   if (abs(infaBelly.filteredRead - EXPECTED_BOTTOM) > DISTANCE_TOLERANCE) {
-    Serial.println("Hello");
   }
   
   else if (colour < COLOUR_BLACK) {
@@ -70,16 +71,19 @@ void detectBase(void) {
     area = AREA_HOME;
   }
   else if (colour < MAX_COLOUR) {
-    area = AREA_ENEMY;
+    enemyCount++;
+    if (enemyCount > 3) {
+      area = AREA_ENEMY;
+    }
   }
-  Serial.println(area);
+  //Serial.println(area);
 }
 
 
 void setHomeColour(void) {
   findColour();
   homeColour = colour;
-  int expectedBottom = infaBelly.filteredRead;
+  int expectedBottom = infaBelly.filteredRead; 
 }
 
 
@@ -91,8 +95,8 @@ void checkColour(void) {
     navigationState.updateState(STATE_EVACUATE);
   }
   if (area == AREA_ARENA) {
-    setMotorSpeed(70);
-    setTurnSpeed(70);
+    setMotorSpeed(80);
+    setTurnSpeed(80);
   }
   if (area == AREA_HOME) {
     setMotorSpeed(50);

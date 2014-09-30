@@ -10,6 +10,8 @@
 bool collect_trigger = false;
 bool weightCollect = false;
 
+int weightDetect = 0;
+int motorsGoing = true;
   
 void setup() {
   Serial.begin(9600);
@@ -22,8 +24,8 @@ void setup() {
   leftWheel.attach(6);  // S11 (on port S6)
   rightWheel.attach(7); // S12 (on port S6)
   
-  leftWingServo.attach(11);
-  rightWingServo.attach(8);
+  leftWingServo.attach(8);
+  rightWingServo.attach(11);
   leftArmServo.attach(10);
   rightArmServo.attach(9);
   gateServo.attach(13);
@@ -32,8 +34,8 @@ void setup() {
   
   //WHISKER STUFF
     cli();
-  attachInterrupt(5, WISR, FALLING); //enable interrupt0 (pin2)
-  pinMode(2, INPUT);
+  attachInterrupt(4, WISR, FALLING); //enable interrupt0 (pin2)
+  pinMode(19, INPUT);
   TCCR1A = 0x00; //normal operation mode
   TCCR1B = 0x03; //64x prescale for 250kHz clock
   TCNT1=0x0000; //16bit counter register initialised to 0
@@ -54,12 +56,23 @@ void initRobot(void) {
   driveState.setToDefault();
   navigationState.setToDefault();
   setMotorDir(MOTOR_FORWARDS);
+  changeToWallFollowState();
+  
   initColourView();
-  updateSensors();
+  for (int i = 0; i < 8; i++) {
+    updateSensors();
+  }
+  
   currentSensor = determineWallFollow();
   setHomeColour();
   frontSensor.write(SENSOR_MIDDLE);
+  motorsGoing = true;
+  collect_trigger = false;
   
+  rightWing.setDesiredAngle(160);
+  
+  rightArm.setDesiredAngle(110);
+  leftArm.setDesiredAngle(110);
 }
 
 
@@ -68,18 +81,17 @@ void initRobot(void) {
 void checkSwitches() {
   powerSwitch.updateSwitch();
   limitRamp.updateSwitch();
+  limitHiFive.updateSwitch();
+  limitFront.updateSwitch();
   
-  switch (limitRamp.switchState) {
-    case SWITCH_ON:
-        collect_trigger = true;
-    break;
-    
-    case SWITCH_OFF:
-        if (collect_trigger) {
-            weightCollect = true;
-            collect_trigger = false;
-        }
-    break;
+  //Serial.println(limitFront.switchState);
+  
+  if (limitFront.switchState == SWITCH_ON) {
+        navigationState.updateState(STATE_EVACUATE);
+  }
+  
+  if (limitRamp.switchState == SWITCH_OFF) {
+       collect_trigger = true;
   }
   
   switch (powerSwitch.switchState) {
@@ -94,6 +106,9 @@ void checkSwitches() {
     break;
   }
 }
+
+
+
 
 
 // Updates the front, left and right infa-red sensors
@@ -112,6 +127,8 @@ void sweepAll (void) {
   leftArm.sweep(leftArmServo);
   rightArm.sweep(rightArmServo);
   gateArm.sweep(gateServo);
+  
+  rightWing.sweep(rightWingServo);
 }
 
 int startTime = 0;
@@ -120,7 +137,7 @@ bool millisDelay (int DelayTime){
    if(startTime == 0){
       startTime = millis(); 
    }
-   if ((millis() - startTime) >= DelayTime){
+   if ((millis() - startTime) % DelayTime == 0){
       goTime = true;
      startTime = 0;
    } 
@@ -128,7 +145,6 @@ bool millisDelay (int DelayTime){
 }
 
 void loop() {
-  
   checkSwitches();
   sweepAll();
   //Serial.println(powerState.returnState());
@@ -142,11 +158,24 @@ void loop() {
     if (tick % 4 == 0) {
       navigateRobot();
     }
+    
+    if (collect_trigger) {
+      fullStop();
+      rightWing.setDesiredAngle(90);
+      if (limitHiFive.switchState == SWITCH_ON) {
+        rightWing.setDesiredAngle(160);
+        collect_trigger = false;
+        weightCollect = true;
+      }
+    }
   break;
   
   case STATE_OFF:
     fullStop();
-   navigationState.updateState(STATE_SEARCHING);
+    leftArm.setDesiredAngle(0);
+     rightArm.setDesiredAngle( 0);
+     gateArm.setDesiredAngle(120);
+     rightWing.setDesiredAngle(160);
   break;
   }
   tick++;
