@@ -48,7 +48,7 @@
 
 
   State powerState(STATE_OFF);
-  State navigationState(STATE_SEARCHING);
+  State navigationState(STATE_WALL_FOLLOW);
   State driveState(STATE_STRAIGHT);
   State followState(STATE_LEFT_WALL);
 

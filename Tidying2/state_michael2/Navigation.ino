@@ -98,7 +98,9 @@ void navigateRobot (void) {
     break;
   
     case STATE_SEARCHING:
-      currentSensor = determineWallFollow(); 
+      if (driveState.returnState() == STATE_STRAIGHT) {
+        currentSensor = determineWallFollow(); 
+      }
       avoidWall();
       //findWeight();
     break;

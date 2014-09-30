@@ -16,8 +16,8 @@
 #define AREA_HOME 1
 #define AREA_ENEMY 2
 
-#define EXPECTED_BOTTOM 420
-#define DISTANCE_TOLERANCE 30
+#define EXPECTED_BOTTOM 460
+#define DISTANCE_TOLERANCE 40
 
 
 Adafruit_TCS34725 tcs;
@@ -58,8 +58,9 @@ void findColour(void)
 
 
 void detectBase(void) {
-  
+  //Serial.print(colour); Serial.print('\t'); Serial.println(infaBelly.filteredRead);
   if (abs(infaBelly.filteredRead - EXPECTED_BOTTOM) > DISTANCE_TOLERANCE) {
+    Serial.println("Hello");
   }
   
   else if (colour < COLOUR_BLACK) {
@@ -71,7 +72,7 @@ void detectBase(void) {
   else if (colour < MAX_COLOUR) {
     area = AREA_ENEMY;
   }
-  //Serial.println(area);
+  Serial.println(area);
 }
 
 

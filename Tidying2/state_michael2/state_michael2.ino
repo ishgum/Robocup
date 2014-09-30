@@ -129,7 +129,7 @@ void loop() {
       checkColour();
     }
     if (tick % 4 == 0) {
-      navigateRobot();
+      //navigateRobot();
     }
   break;
   
