@@ -11,7 +11,6 @@ bool collect_trigger = false;
 bool weightCollect = false;
 
 int weightDetect = 0;
-int motorsGoing = true;
   
 void setup() {
   Serial.begin(9600);
@@ -30,7 +29,6 @@ void setup() {
   rightArmServo.attach(9);
   gateServo.attach(13);
   
-  initColourView();
   
   //WHISKER STUFF
     cli();
@@ -43,6 +41,7 @@ void setup() {
   
   tick = 0;
   
+  initRobot();
 }
 
 void WISR(void)
@@ -56,9 +55,10 @@ void initRobot(void) {
   driveState.setToDefault();
   navigationState.setToDefault();
   setMotorDir(MOTOR_FORWARDS);
-  changeToWallFollowState();
-  
+  navigationState.updateState(STATE_WALL_FOLLOW);  
   initColourView();
+  
+  
   for (int i = 0; i < 8; i++) {
     updateSensors();
   }
@@ -66,7 +66,6 @@ void initRobot(void) {
   currentSensor = determineWallFollow();
   setHomeColour();
   frontSensor.write(SENSOR_MIDDLE);
-  motorsGoing = true;
   collect_trigger = false;
   
   rightWing.setDesiredAngle(160);
@@ -123,6 +122,7 @@ void updateSensors (void) {
   currentSensor.updateSensor();
 }
 
+
 void sweepAll (void) {
   leftArm.sweep(leftArmServo);
   rightArm.sweep(rightArmServo);
@@ -131,27 +131,21 @@ void sweepAll (void) {
   rightWing.sweep(rightWingServo);
 }
 
-int startTime = 0;
-bool millisDelay (int DelayTime){
-   bool goTime = false;
-   if(startTime == 0){
-      startTime = millis(); 
-   }
-   if ((millis() - startTime) % DelayTime == 0){
-      goTime = true;
-     startTime = 0;
-   } 
-   return goTime;
-}
+
 
 void loop() {
+  
+  
   checkSwitches();
   sweepAll();
-  //Serial.println(powerState.returnState());
+  updateSensors();
+  driveRobot();
+  
+  
   switch (powerState.returnState()) {
     case STATE_ON:
-    updateSensors();
     findWeights();
+    
     if (tick % 100 == 0) {
       checkColour();
     }
@@ -160,8 +154,9 @@ void loop() {
     }
     
     if (collect_trigger) {
-      fullStop();
+      driveState.updateState(STATE_STOPPED);
       rightWing.setDesiredAngle(90);
+      
       if (limitHiFive.switchState == SWITCH_ON) {
         rightWing.setDesiredAngle(160);
         collect_trigger = false;
@@ -171,11 +166,13 @@ void loop() {
   break;
   
   case STATE_OFF:
-    fullStop();
-    leftArm.setDesiredAngle(0);
+     driveState.updateState(STATE_STOPPED);
+     
+     leftArm.setDesiredAngle(0);
      rightArm.setDesiredAngle( 0);
      gateArm.setDesiredAngle(120);
      rightWing.setDesiredAngle(160);
+     
   break;
   }
   tick++;

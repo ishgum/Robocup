@@ -11,6 +11,8 @@
 
 int evacuateStep = 0;
 
+
+
 // Updates the error for the angle as well as for the wall following
 
 Sensors determineWallFollow (void) {
@@ -28,11 +30,6 @@ Sensors determineWallFollow (void) {
 }
 
 
-// Updates errors for the left and right sensors, allowing PID control to be implemented
-void updateErrors (void) {
-    currentError.findError(currentSensor.filteredRead);
-}
-
 
 // If the sensor reads a wall within a certain distance it will change the state to turning
 Sensors findTurn (Sensors sensor, int distance) {
@@ -43,6 +40,8 @@ Sensors findTurn (Sensors sensor, int distance) {
   }
   return sensor;
 }
+
+
 
 
 // If the robot is turning, and the sensor reads that the wall is no longer within a certain distance, the robot will begin moving straight
@@ -80,11 +79,16 @@ void avoidWall (void) {
     }
 }
 
+
+
 void findWeight (void) {
    if(!infaFront.findWall(MAX_OBJ_DIST) && infaBottom.findWall(MAX_OBJ_DIST)){
       navigationState.updateState(STATE_HONING);
    } 
 }
+
+
+
 
 // High level function which moves the robot around the arena
 void navigateRobot (void) {
@@ -93,8 +97,7 @@ void navigateRobot (void) {
       
     case STATE_EVACUATE:
       if (evacuateStep == 0) {
-        fullStop();
-        //delay(1000);
+        driveState.updateState(STATE_STOPPED);
         if (tick % 1000 == 0) {
           evacuateStep = 1;
         }
@@ -113,7 +116,7 @@ void navigateRobot (void) {
       else if (evacuateStep == 2) {
         changeToTurnState();
         if (tick % 500 == 0) {
-          changeToSearchingState();
+          navigationState.updateState(STATE_SEARCHING);
           infaLeft.ignore = false;
           infaRight.ignore = false;
           infaFront.ignore = false;
@@ -121,28 +124,35 @@ void navigateRobot (void) {
       }
     break;
   
+  
     case STATE_WALL_FOLLOW:
-      updateErrors();
+    
+      currentError.findError(currentSensor.filteredRead);
       navigateCorner();
+      
     break;
   
     case STATE_SEARCHING:
+      
+      leftError.error = 0;
+      rightError.error = 0;
+      
       if (driveState.returnState() == STATE_STRAIGHT) {
         currentSensor = determineWallFollow(); 
       }
       avoidWall();
       
-      //findWeight();
     break;
   
+  
     case STATE_COLLECTING:
-      changeToSearchingState(); 
+      navigationState.updateState(STATE_SEARCHING);
     break;
+    
     
     case STATE_HONING:
       fullStop();
     break;
   }
-  driveRobot(driveState, currentError.error/5);
 }
 

@@ -11,17 +11,12 @@ class PID
 		PID (int desired);
                 float findError (float currentValue);
                 void setDesiredValue(float newValue);
-                void scaleError(signed int scale);
-                float currentDesiredValue(void);
+                signed int scaleError(signed int scale);
+                
                 float error;
-                float scaledError;
-                float desiredValue;
-                bool ignore;
-                int sweepDirection;
 	private:
-		
-	
-    
+                float desiredValue;
+                float scaledError;
 };
 
 #endif

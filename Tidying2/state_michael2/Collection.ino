@@ -58,7 +58,6 @@ void collect(){
       //collect_trigger = true;
         if (weightCollect) {
             weightCollect = false;
-            motorsGoing = true;
             //changeToTurnState();
             collect_trigger = false;
             
@@ -84,7 +83,6 @@ void collect(){
      case LOWER:   
       if (gateArm.checkMoving() == false) {
         if(tick % 500 == 0){
-          startTime = 0;
           leftArm.setDesiredAngle(180);
           rightArm.setDesiredAngle(180);
           sweep_dir = SWEEPING_IN;

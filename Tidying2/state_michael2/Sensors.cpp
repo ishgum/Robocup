@@ -7,7 +7,7 @@ Sensors::Sensors(int port)
   _currentRead= 0;
   _index = 0;
   filteredRead = 0;
-  found = 0;
+  _found = 0;
   ignore = true;
 }
 
@@ -15,18 +15,21 @@ Sensors::Sensors(int port)
 // Updates a single sensor using a MAF
 
 void Sensors::updateSensor () {
-	_currentRead = analogRead(_port);
-	_filterArray[_index] = _currentRead;
-	unsigned int temp_sum = 0;
-        for (int i = 0; i < SENSOR_FILTER_SIZE; i++)
-	{
-		temp_sum += _filterArray[i];
-	}
-            filteredRead = temp_sum / SENSOR_FILTER_SIZE;
-	_index++;
-	if (_index == (SENSOR_FILTER_SIZE)) {
-		_index = 0;
-	}
+    _currentRead = analogRead(_port);
+    _filterArray[_index] = _currentRead;
+    
+    unsigned int temp_sum = 0;
+    for (int i = 0; i < SENSOR_FILTER_SIZE; i++)
+    {
+        temp_sum += _filterArray[i];
+    }
+    filteredRead = temp_sum / SENSOR_FILTER_SIZE;
+    _index++;
+    
+    
+    if (_index == (SENSOR_FILTER_SIZE)) {
+        _index = 0;
+    }
 }
 
 
@@ -34,12 +37,12 @@ void Sensors::updateSensor () {
 
 int Sensors::findWall (unsigned int recognitionDistance) {
     if (filteredRead >= recognitionDistance) {
-      found = 1;
+      _found = 1;
     }
     else if (filteredRead < recognitionDistance) {
-      found = 0;
+      _found = 0;
     }
     
-    return found;
+    return _found;
 }
 

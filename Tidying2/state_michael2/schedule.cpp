@@ -1,20 +1,46 @@
 #include "schedule.h"
 #include "Arduino.h"
 
-schedule::schedule(int delayTime){
-	delay_time = delayTime;
-	current_time = 0;
-	prev_time = 0;
-	progress = false;
-	delta_time = 0;
+static bool called[WAIT_ARRAY_SIZE] = {false};
+static int prevTime[WAIT_ARRAY_SIZE];
+
+schedule::schedule(int input_scheduleTime){
+	scheduleTime = input_scheduleTime;
+
+	prevCall = millis();
+	scheduleReady = false;
+
 }
 
-bool schedule::ready(void){
-	if(millis()%delay_time == 0){
-		progress = true;                 
-	}else{
-		progress = false;
-	}
-	return progress;
+bool schedule::ready (void) {
+    if ((millis() - prevCall) > scheduleTime) {
+	scheduleReady = true;              
+    }
+    
+    else
+    {
+	scheduleReady = false;
+    }
+    return scheduleReady;
 }
 
+
+
+bool wait (int instance, int delayTime) {
+  if (called[instance] == false) {
+    prevTime[instance] = millis();
+    called[instance] = true;
+  }
+  
+  else if (millis() - prevTime[instance] > delayTime) {
+    called[instance] = false;
+    return true;
+  }
+  
+  else {
+      return false;
+  }
+}
+  
+  
+  

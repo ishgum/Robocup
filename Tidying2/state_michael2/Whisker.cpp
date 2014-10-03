@@ -1,5 +1,6 @@
 #include "Whisker.h"
 
+
 Whisker::Whisker(void){
 	count = 3000;
 	pulses = 0;
@@ -11,7 +12,7 @@ Whisker::Whisker(void){
 }
 
 
-bool Whisker::detect (){;
+bool Whisker::detect (){
  	cli(); //critical section
 	time = TCNT1;
 	pulses = count; 

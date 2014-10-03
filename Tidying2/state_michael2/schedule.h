@@ -1,19 +1,21 @@
 #ifndef schedule_h
 #define schedule_h
 
+#define WAIT_ARRAY_SIZE 10
+
+
 class schedule{
 	public:
-		schedule(int delayTime);
+		schedule(int scheduleTime);
 		bool ready(void);
 
 	private:
-		unsigned long current_time;
-		unsigned long prev_time;
-		unsigned long delay_time;
-		bool progress;
-		unsigned long delta_time;
+		unsigned long prevCall;
+		unsigned long scheduleTime;
+		bool scheduleReady;
 };
 
 
+bool wait (int instance, int delayTime);
 
 #endif
