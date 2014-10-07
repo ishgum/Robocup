@@ -35,7 +35,7 @@ Sensors determineWallFollow (void) {
 Sensors findTurn (Sensors sensor, int distance) {
   sensor.ignore = true;
   if (sensor.findWall(distance)) {
-    changeToTurnState();
+    driveState.updateState(STATE_TURNING);
     sensor.ignore = false;
   }
   return sensor;
@@ -47,7 +47,7 @@ Sensors findTurn (Sensors sensor, int distance) {
 // If the robot is turning, and the sensor reads that the wall is no longer within a certain distance, the robot will begin moving straight
 void findStraight (Sensors sensor, int distance) {
   if (!sensor.findWall(distance) && sensor.ignore == false) {
-    changeToStraightState();
+    driveState.updateState(STATE_STRAIGHT);
   }
 }
 
@@ -96,47 +96,37 @@ void navigateRobot (void) {
   switch (navigationState.returnState()) {
       
     case STATE_EVACUATE:
-      if (evacuateStep == 0) {
-        driveState.updateState(STATE_STOPPED);
-        if (tick % 1000 == 0) {
-          evacuateStep = 1;
-        }
-      }
-      
-      else if (evacuateStep == 1) {
-        changeToStraightState();
+      if (evacuateStep == 0 && wait(1, 5000)) {      // Drive straight backwards
+        driveState.updateState(STATE_STRAIGHT);
         setMotorDir(MOTOR_BACKWARDS);
-        if (tick % 500 == 0) {
-          evacuateStep = 2;
-          setMotorDir(MOTOR_FORWARDS);
-          determineWallFollow();
-        }
+        evacuateStep = 1;
       }
       
-      else if (evacuateStep == 2) {
-        changeToTurnState();
-        if (tick % 500 == 0) {
+      else if (evacuateStep == 1 && wait(1, 5000)) {    // Turn
+        setMotorDir(MOTOR_FORWARDS);
+        determineWallFollow();
+        driveState.updateState(STATE_TURNING);
+        evacuateStep = 2;
+      }
+      
+      else if (evacuateStep == 2 && wait(1, 5000)) {    // Change back to searching state
+          Serial.println("Hereeeee");
           navigationState.updateState(STATE_SEARCHING);
           infaLeft.ignore = false;
           infaRight.ignore = false;
           infaFront.ignore = false;
-        }
       }
+      Serial.println(evacuateStep);
     break;
   
   
     case STATE_WALL_FOLLOW:
-    
       currentError.findError(currentSensor.filteredRead);
       navigateCorner();
       
     break;
   
-    case STATE_SEARCHING:
-      
-      leftError.error = 0;
-      rightError.error = 0;
-      
+    case STATE_SEARCHING:      
       if (driveState.returnState() == STATE_STRAIGHT) {
         currentSensor = determineWallFollow(); 
       }

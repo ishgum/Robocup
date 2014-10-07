@@ -13,7 +13,7 @@ class Sensors
 		void updateSensor();
                 int findWall (unsigned int recognitionDistance);
 		int filteredRead;
-		int found;
+		int _found;
                 bool ignore;
 	private:
 		int _port;

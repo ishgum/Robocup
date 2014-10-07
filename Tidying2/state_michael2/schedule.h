@@ -16,6 +16,6 @@ class schedule{
 };
 
 
-bool wait (int instance, int delayTime);
+bool wait (int instance, unsigned long delayTime);
 
 #endif

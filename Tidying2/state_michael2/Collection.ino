@@ -1,6 +1,6 @@
 
 int sweep_dir = STATIC;
-bool detected = false;
+
 //int originalTick = 0;
 #define DETECT_BUFFER 6
 
@@ -8,12 +8,12 @@ void findWeights (void) {
   //Serial.println(whisker.detect());
   if (whisker.detect() && detected == false) {         
      weightDetect++;
-     Serial.println("here");
+     //Serial.println("here");
   }
   
   if (weightDetect >= DETECT_BUFFER) {
     sweep_dir = SWEEP1;
-    detected = true;
+    //detected = true;
     weightDetect = 0;
   }
   

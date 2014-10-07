@@ -2,7 +2,7 @@
 #include "Arduino.h"
 
 static bool called[WAIT_ARRAY_SIZE] = {false};
-static int prevTime[WAIT_ARRAY_SIZE];
+static unsigned long prevTime[WAIT_ARRAY_SIZE];
 
 schedule::schedule(int input_scheduleTime){
 	scheduleTime = input_scheduleTime;
@@ -26,19 +26,19 @@ bool schedule::ready (void) {
 
 
 
-bool wait (int instance, int delayTime) {
+bool wait (int instance, unsigned long delayTime) {
   if (called[instance] == false) {
     prevTime[instance] = millis();
     called[instance] = true;
   }
   
-  else if (millis() - prevTime[instance] > delayTime) {
+  else if ((millis() - prevTime[instance]) > delayTime) {
     called[instance] = false;
     return true;
   }
   
   else {
-      return false;
+    return false;
   }
 }
   

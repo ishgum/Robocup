@@ -57,14 +57,16 @@
   PID currentError(WALL_FOLLOW_DISTANCE);
   
   Switch powerSwitch(3, 0, PULSE_ON);
-  Switch limitFront(8, 10, PULSE_OFF);
-  Switch limitRamp(9, 10, PULSE_OFF);
-  Switch limitHiFive(11, 10, PULSE_OFF);
+  Switch limitFront(9, 10, PULSE_OFF);
+  Switch limitRamp(8, 10, PULSE_OFF);
+  Switch limitLeftWing(10, 10, PULSE_OFF);
+  Switch limitRightWing(11, 10, PULSE_OFF);
     
   Arm leftArm(LEFT_SIDE, 0);
   Arm rightArm (RIGHT_SIDE, 180);
   
-  Arm rightWing(LEFT_SIDE, 180);
+  Arm rightWing(RIGHT_SIDE, 180);
+  Arm leftWing(LEFT_SIDE, 180);
   Arm gateArm(RIGHT_SIDE, 90);
 
 // State things  

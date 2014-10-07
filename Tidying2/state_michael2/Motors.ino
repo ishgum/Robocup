@@ -52,7 +52,6 @@ void driveRobot () {
   if (driveState.returnState() == STATE_STRAIGHT) {
     straight();
   }
-  
   if (driveState.returnState() == STATE_TURNING) {      
     turn();
   } 

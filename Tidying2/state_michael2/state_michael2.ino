@@ -9,6 +9,7 @@
 
 bool collect_trigger = false;
 bool weightCollect = false;
+bool detected = false;
 
 int weightDetect = 0;
   
@@ -19,15 +20,15 @@ void setup() {
   pinMode(DIGITAL_OUT_POWER, OUTPUT); 
   digitalWrite(DIGITAL_OUT_POWER, 1);
 
-  frontSensor.attach(12);
-  leftWheel.attach(6);  // S11 (on port S6)
-  rightWheel.attach(7); // S12 (on port S6)
+  frontSensor.attach(9);
+  leftWheel.attach(12);  // S11 (on port S6)
+  rightWheel.attach(13); // S12 (on port S6)
   
-  leftWingServo.attach(8);
-  rightWingServo.attach(11);
-  leftArmServo.attach(10);
-  rightArmServo.attach(9);
-  gateServo.attach(13);
+  leftWingServo.attach(6);
+  rightWingServo.attach(7);
+  leftArmServo.attach(8);
+  rightArmServo.attach(11);
+  gateServo.attach(10);
   
   
   //WHISKER STUFF
@@ -58,11 +59,10 @@ void initRobot(void) {
   navigationState.updateState(STATE_WALL_FOLLOW);  
   initColourView();
   
-  
   for (int i = 0; i < 8; i++) {
     updateSensors();
   }
-  
+  Serial.println("init");
   currentSensor = determineWallFollow();
   setHomeColour();
   frontSensor.write(SENSOR_MIDDLE);
@@ -80,29 +80,33 @@ void initRobot(void) {
 void checkSwitches() {
   powerSwitch.updateSwitch();
   limitRamp.updateSwitch();
-  limitHiFive.updateSwitch();
+  limitLeftWing.updateSwitch();
+  limitRightWing.updateSwitch();
   limitFront.updateSwitch();
   
-  //Serial.println(limitFront.switchState);
+  //Serial.print(limitRightWing.switchState); Serial.print('\t'); Serial.print(limitLeftWing.switchState); Serial.print('\t'); Serial.print(limitFront.switchState); Serial.print('\t'); Serial.println(limitRamp.switchState); 
   
   if (limitFront.switchState == SWITCH_ON) {
         navigationState.updateState(STATE_EVACUATE);
+        //detected = true;
   }
   
   if (limitRamp.switchState == SWITCH_OFF) {
        collect_trigger = true;
   }
   
+  if (limitRightWing.switchState == SWITCH_ON) {
+       //detected = true;
+  }
+  
   switch (powerSwitch.switchState) {
     case SWITCH_ON:
-    powerState.updateState(STATE_ON);
-    initRobot();
-    
+      powerState.updateState(STATE_ON);    
     break;
+    
   case SWITCH_OFF:
     powerState.updateState(STATE_OFF);
-    driveState.updateState(STATE_STOPPED);
-    break;
+   break;
   }
 }
 
@@ -116,8 +120,8 @@ void updateSensors (void) {
   infaFront.updateSensor();
   infaLeft.updateSensor();
   infaRight.updateSensor();
-  infaBottom.updateSensor();
-  infaBelly.updateSensor();
+  //infaBottom.updateSensor();
+  //infaBelly.updateSensor();
   
   currentSensor.updateSensor();
 }
@@ -129,10 +133,11 @@ void sweepAll (void) {
   gateArm.sweep(gateServo);
   
   rightWing.sweep(rightWingServo);
+  leftWing.sweep(leftWingServo);
 }
 
 
-
+int stateTest = 1;
 void loop() {
   
   
@@ -141,37 +146,32 @@ void loop() {
   updateSensors();
   driveRobot();
   
-  
+  gateArm.setDesiredAngle(50);
+     
   switch (powerState.returnState()) {
-    case STATE_ON:
-    findWeights();
-    
-    if (tick % 100 == 0) {
-      checkColour();
-    }
-    if (tick % 4 == 0) {
-      navigateRobot();
-    }
-    
-    if (collect_trigger) {
-      driveState.updateState(STATE_STOPPED);
-      rightWing.setDesiredAngle(90);
+    case STATE_ON:    
+      findWeights();
       
-      if (limitHiFive.switchState == SWITCH_ON) {
-        rightWing.setDesiredAngle(160);
-        collect_trigger = false;
-        weightCollect = true;
+      if (tick % 100 == 0) {
+        checkColour();
       }
-    }
+      if (tick % 4 == 0) {
+        navigateRobot();
+      }
+      
+      if (collect_trigger) {
+        driveState.updateState(STATE_STOPPED);
+        rightWing.setDesiredAngle(90);
+        
+        if (limitRightWing.switchState == SWITCH_ON) {
+          rightWing.setDesiredAngle(160);
+          collect_trigger = false;
+          weightCollect = true;
+        }
+      }
   break;
   
   case STATE_OFF:
-     driveState.updateState(STATE_STOPPED);
-     
-     leftArm.setDesiredAngle(0);
-     rightArm.setDesiredAngle( 0);
-     gateArm.setDesiredAngle(120);
-     rightWing.setDesiredAngle(160);
      
   break;
   }
