@@ -19,7 +19,7 @@
 #define SENSOR_MIDDLE 105
 #define SENSOR_ANGLE 30
 
-#define WALL_FOLLOW_DISTANCE 350
+#define WALL_FOLLOW_DISTANCE 300
 
 // Peripherals
 
@@ -41,8 +41,8 @@
   Sensors infaFront(4);
   Sensors infaLeft(0);
   Sensors infaRight(1);
-  Sensors infaBottom(7);
-  Sensors infaBelly(6);
+  Sensors infaBottom(11);
+  Sensors infaBelly(10);
   
   Sensors currentSensor(10);
 
@@ -56,11 +56,11 @@
   PID rightError(WALL_FOLLOW_DISTANCE);
   PID currentError(WALL_FOLLOW_DISTANCE);
   
-  Switch powerSwitch(3, 0, PULSE_ON);
-  Switch limitFront(9, 10, PULSE_OFF);
-  Switch limitRamp(8, 10, PULSE_OFF);
-  Switch limitLeftWing(10, 10, PULSE_OFF);
-  Switch limitRightWing(11, 10, PULSE_OFF);
+  Switch powerSwitch(3, PULSE_ON, ANALOG);
+  Switch limitFront(45, PULSE_OFF, DIGITAL);
+  Switch limitRamp(44, PULSE_OFF, DIGITAL);
+  Switch limitLeftWing(10, PULSE_OFF, DIGITAL);
+  Switch limitRightWing(43, PULSE_OFF, DIGITAL);
     
   Arm leftArm(LEFT_SIDE, 0);
   Arm rightArm (RIGHT_SIDE, 180);

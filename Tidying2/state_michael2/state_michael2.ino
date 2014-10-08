@@ -7,11 +7,7 @@
 #include "Adafruit_TCS34725.h"
 #include "state_michael2.h"
 
-bool collect_trigger = false;
-bool weightCollect = false;
-bool detected = false;
 
-int weightDetect = 0;
   
 void setup() {
   Serial.begin(9600);
@@ -43,6 +39,11 @@ void setup() {
   tick = 0;
   
   initRobot();
+  
+  pinMode(42, INPUT);
+  pinMode(43, INPUT);
+  pinMode(44, INPUT);
+  pinMode(45, INPUT);
 }
 
 void WISR(void)
@@ -56,22 +57,21 @@ void initRobot(void) {
   driveState.setToDefault();
   navigationState.setToDefault();
   setMotorDir(MOTOR_FORWARDS);
-  navigationState.updateState(STATE_WALL_FOLLOW);  
-  initColourView();
+  //initColourView();
   
   for (int i = 0; i < 8; i++) {
     updateSensors();
   }
-  Serial.println("init");
+  
   currentSensor = determineWallFollow();
-  setHomeColour();
+
   frontSensor.write(SENSOR_MIDDLE);
-  collect_trigger = false;
+
+  rightArm.setDesiredAngle(120);
+  leftArm.setDesiredAngle(40);
   
-  rightWing.setDesiredAngle(160);
-  
-  rightArm.setDesiredAngle(110);
-  leftArm.setDesiredAngle(110);
+  setTurnSpeed(DEFAULT_SPEED);
+  setMotorSpeed(DEFAULT_SPEED);
 }
 
 
@@ -85,19 +85,6 @@ void checkSwitches() {
   limitFront.updateSwitch();
   
   //Serial.print(limitRightWing.switchState); Serial.print('\t'); Serial.print(limitLeftWing.switchState); Serial.print('\t'); Serial.print(limitFront.switchState); Serial.print('\t'); Serial.println(limitRamp.switchState); 
-  
-  if (limitFront.switchState == SWITCH_ON) {
-        navigationState.updateState(STATE_EVACUATE);
-        //detected = true;
-  }
-  
-  if (limitRamp.switchState == SWITCH_OFF) {
-       collect_trigger = true;
-  }
-  
-  if (limitRightWing.switchState == SWITCH_ON) {
-       //detected = true;
-  }
   
   switch (powerSwitch.switchState) {
     case SWITCH_ON:
@@ -120,8 +107,9 @@ void updateSensors (void) {
   infaFront.updateSensor();
   infaLeft.updateSensor();
   infaRight.updateSensor();
-  //infaBottom.updateSensor();
-  //infaBelly.updateSensor();
+  infaBottom.updateSensor();
+  infaBelly.updateSensor();
+  
   
   currentSensor.updateSensor();
 }
@@ -137,7 +125,6 @@ void sweepAll (void) {
 }
 
 
-int stateTest = 1;
 void loop() {
   
   
@@ -146,33 +133,30 @@ void loop() {
   updateSensors();
   driveRobot();
   
-  gateArm.setDesiredAngle(50);
      
   switch (powerState.returnState()) {
     case STATE_ON:    
       findWeights();
       
       if (tick % 100 == 0) {
-        checkColour();
+        //checkColour();
       }
       if (tick % 4 == 0) {
         navigateRobot();
       }
       
-      if (collect_trigger) {
-        driveState.updateState(STATE_STOPPED);
-        rightWing.setDesiredAngle(90);
-        
-        if (limitRightWing.switchState == SWITCH_ON) {
-          rightWing.setDesiredAngle(160);
-          collect_trigger = false;
-          weightCollect = true;
-        }
+      if (tick % 5 == 0) {
+        //infraredLocate();
       }
+      
+      if (tick % 5 == 0) {
+        checkWings();
+      }
+      
   break;
   
   case STATE_OFF:
-     
+     driveState.updateState(STATE_STOPPED);
   break;
   }
   tick++;

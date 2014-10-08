@@ -80,10 +80,38 @@ void avoidWall (void) {
 }
 
 
+void evacuateArea(void) {
+    if (evacuateStep == 0 && wait(1, 1000)) {      // Drive straight backwards
+            driveState.updateState(STATE_STRAIGHT);
+            setMotorDir(MOTOR_BACKWARDS);
+            evacuateStep = 1;
+          }
+          
+    else if (evacuateStep == 1 && wait(1, 1000)) {    // Turn
+      setMotorDir(MOTOR_FORWARDS);
+      determineWallFollow();
+      driveState.updateState(STATE_TURNING);
+      evacuateStep = 2;
+      
+    }
+    
+    else if (evacuateStep == 2 && wait(1, 1000)) {    // Change back to searching state
+        navigationState.updateState(STATE_SEARCHING);
+        infaLeft.ignore = false;
+        infaRight.ignore = false;
+        infaFront.ignore = false;
+    }
+}
 
-void findWeight (void) {
-   if(!infaFront.findWall(MAX_OBJ_DIST) && infaBottom.findWall(MAX_OBJ_DIST)){
-      navigationState.updateState(STATE_HONING);
+
+
+
+
+void infraredLocate (void) {
+  float linearTop = 30431 * pow(infaFront.filteredRead, -1.169);
+  float linearBottom = 30431 * pow(infaBottom.filteredRead, -1.169);
+   if((linearTop - linearBottom + 30.0) > 50.0 && driveState.returnState() == STATE_STRAIGHT){
+      powerState.updateState(STATE_OFF);
    } 
 }
 
@@ -96,27 +124,7 @@ void navigateRobot (void) {
   switch (navigationState.returnState()) {
       
     case STATE_EVACUATE:
-      if (evacuateStep == 0 && wait(1, 5000)) {      // Drive straight backwards
-        driveState.updateState(STATE_STRAIGHT);
-        setMotorDir(MOTOR_BACKWARDS);
-        evacuateStep = 1;
-      }
-      
-      else if (evacuateStep == 1 && wait(1, 5000)) {    // Turn
-        setMotorDir(MOTOR_FORWARDS);
-        determineWallFollow();
-        driveState.updateState(STATE_TURNING);
-        evacuateStep = 2;
-      }
-      
-      else if (evacuateStep == 2 && wait(1, 5000)) {    // Change back to searching state
-          Serial.println("Hereeeee");
-          navigationState.updateState(STATE_SEARCHING);
-          infaLeft.ignore = false;
-          infaRight.ignore = false;
-          infaFront.ignore = false;
-      }
-      Serial.println(evacuateStep);
+      evacuateArea();
     break;
   
   
@@ -143,6 +151,11 @@ void navigateRobot (void) {
     case STATE_HONING:
       fullStop();
     break;
+  }
+  
+  
+  if (limitFront.switchState == SWITCH_ON && navigationState.returnState() != STATE_EVACUATE) {
+        navigationState.updateState(STATE_EVACUATE);
   }
 }
 

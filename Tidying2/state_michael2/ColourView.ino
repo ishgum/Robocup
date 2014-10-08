@@ -28,7 +28,7 @@ static int homeColour;
 
 uint16_t colour, red, green, blue;
 
-int area;
+int area = AREA_ARENA;
 
 void initColourView() {
   tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
@@ -91,16 +91,16 @@ void setHomeColour(void) {
 void checkColour(void) {
   findColour();
   detectBase();
-  if (area == AREA_ENEMY) {
+  if (area == AREA_ENEMY && navigationState.returnState() != STATE_EVACUATE) {
     navigationState.updateState(STATE_EVACUATE);
   }
   if (area == AREA_ARENA) {
-    setMotorSpeed(80);
-    setTurnSpeed(80);
+    setMotorSpeed(DEFAULT_SPEED);
+    setTurnSpeed(DEFAULT_SPEED);
   }
   if (area == AREA_HOME) {
-    setMotorSpeed(50);
-    setTurnSpeed(50);
+    setMotorSpeed(MIN_SPEED);
+    setTurnSpeed(MIN_SPEED);
   }
 }
 

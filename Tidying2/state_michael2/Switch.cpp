@@ -1,21 +1,28 @@
 
 #include "Switch.h"
 
-Switch::Switch(int port, int inputDefaultOff, int inputPulse)
+Switch::Switch(int port, int inputPulse, int inputMode)
 {
   _port = port;
   _onCount = 0;
   _offCount = 0;
   switchState = SWITCH_OFF;
-  defaultOff = inputDefaultOff;
   pulse = inputPulse;
+  _mode = inputMode;
 }
 
 
 // Updates a single sensor using a MAF
 
 void Switch::updateSwitch () {
-   if (analogRead(_port) > defaultOff) {
+  if (_mode == ANALOG) {
+    currentRead = analogRead(_port);
+  }
+  if (_mode == DIGITAL) {
+    currentRead = !digitalRead(_port);
+  }
+  
+   if (currentRead > 0) {
      _offCount = 0;
      _onCount += 1;
   }

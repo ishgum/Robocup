@@ -27,49 +27,44 @@ int State::returnState (void) {
 
 
 void initStates (int changeState) {
-  switch (changeState) {
     
-    case STATE_ON:
+    if (changeState == STATE_ON) {
         initRobot();
-    break;
+    }
     
-    case STATE_OFF:
-        driveState.updateState(STATE_STOPPED);
+    else if (changeState == STATE_OFF) {
         leftArm.setDesiredAngle(0);
         rightArm.setDesiredAngle(0);
         gateArm.setDesiredAngle(120);
-        rightWing.setDesiredAngle(90);
-        leftWing.setDesiredAngle(90);
-    break;
+        rightWing.setDesiredAngle(0);
+        leftWing.setDesiredAngle(0);
+    }
     
-    case STATE_STOPPED:
+    else if (changeState == STATE_STOPPED) {
     
-    break;
+    }
     
-    case STATE_STRAIGHT:
+    else if (changeState == STATE_STRAIGHT) {
         frontSensor.write(SENSOR_MIDDLE);
-    break;
+    }
     
-    case STATE_TURNING:
-        sensorTurnAngle = SENSOR_MIDDLE + followState.returnState()*SENSOR_ANGLE;
+    else if (changeState == STATE_TURNING) {
+        sensorTurnAngle = SENSOR_MIDDLE - followState.returnState()*SENSOR_ANGLE;
         frontSensor.write(sensorTurnAngle);
-    break;
+    }
     
-    case STATE_WALL_FOLLOW:
+    else if (changeState == STATE_WALL_FOLLOW) {
         
-    break;
+    }
     
-    case STATE_SEARCHING:
+    else if (changeState == STATE_SEARCHING) {
         leftError.error = 0;
         rightError.error = 0;
         currentError.error = 0;
-    break;
+    }
     
-    case STATE_EVACUATE:
+    else if (changeState == STATE_EVACUATE) {
         driveState.updateState(STATE_STOPPED);
-        rightWing.setDesiredAngle(40);
-        leftWing.setDesiredAngle(40);
         evacuateStep = 0;
-    break;
-  }
+    }
 }

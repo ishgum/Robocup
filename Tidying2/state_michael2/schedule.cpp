@@ -36,10 +36,7 @@ bool wait (int instance, unsigned long delayTime) {
     called[instance] = false;
     return true;
   }
-  
-  else {
-    return false;
-  }
+  return false;
 }
   
   

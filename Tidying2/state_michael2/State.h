@@ -8,8 +8,8 @@
 
 // State defines
 
-#define STATE_ON 1
-#define STATE_OFF 0
+#define STATE_ON 31
+#define STATE_OFF 30
 
 #define STATE_STOPPED 10
 #define STATE_STRAIGHT 11
