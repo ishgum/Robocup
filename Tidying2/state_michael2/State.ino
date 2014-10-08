@@ -49,6 +49,10 @@ void initStates (int changeState) {
     }
     
     else if (changeState == STATE_TURNING) {
+      if (navigationState.returnState() == STATE_SEARCHING) {
+          currentSensor = determineWallFollow(); 
+      }
+        
         sensorTurnAngle = SENSOR_MIDDLE - followState.returnState()*SENSOR_ANGLE;
         frontSensor.write(sensorTurnAngle);
     }
@@ -60,7 +64,7 @@ void initStates (int changeState) {
     else if (changeState == STATE_SEARCHING) {
         leftError.error = 0;
         rightError.error = 0;
-        currentError.error = 0;
+        currentError.error = 150;
     }
     
     else if (changeState == STATE_EVACUATE) {

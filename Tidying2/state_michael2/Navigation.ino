@@ -81,13 +81,13 @@ void avoidWall (void) {
 
 
 void evacuateArea(void) {
-    if (evacuateStep == 0 && wait(1, 1000)) {      // Drive straight backwards
+    if (evacuateStep == 0) {      // Drive straight backwards
             driveState.updateState(STATE_STRAIGHT);
             setMotorDir(MOTOR_BACKWARDS);
             evacuateStep = 1;
           }
           
-    else if (evacuateStep == 1 && wait(1, 1000)) {    // Turn
+    else if (evacuateStep == 1 && wait(1, 500)) {    // Turn
       setMotorDir(MOTOR_FORWARDS);
       determineWallFollow();
       driveState.updateState(STATE_TURNING);
@@ -117,7 +117,7 @@ void infraredLocate (void) {
 
 
 
-
+int wiggle = 0;
 // High level function which moves the robot around the arena
 void navigateRobot (void) {
   //Serial.println(navigationState.returnState());
@@ -136,10 +136,18 @@ void navigateRobot (void) {
   
     case STATE_SEARCHING:      
       if (driveState.returnState() == STATE_STRAIGHT) {
-        currentSensor = determineWallFollow(); 
-      }
-      avoidWall();
+        if (followState.returnState() == STATE_RIGHT_WALL && wait(5, 2000)) {
+          followState.updateState(STATE_LEFT_WALL);
+          Serial.println("wiggle1");
+        }
       
+        else if (followState.returnState() == STATE_LEFT_WALL && wait(5, 2000)) {
+          followState.updateState(STATE_RIGHT_WALL);
+          Serial.println("wiggle2");
+          }
+      }
+      
+      avoidWall();
     break;
   
   

@@ -1,7 +1,7 @@
 
 #include "PID.h"
 
-PID::PID(int desired)
+PID::PID(float desired)
 {
   desiredValue = desired;
   error = 0;
@@ -22,7 +22,7 @@ void PID::setDesiredValue(float newValue) {
 
 
 
-signed int PID::scaleError (signed int scale) {
+float PID::scaleError (float scale) {
   scaledError = error/scale;
   return scaledError;
 }

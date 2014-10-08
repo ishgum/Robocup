@@ -8,10 +8,10 @@
 class PID
 {
 	public:
-		PID (int desired);
+		PID (float desired);
                 float findError (float currentValue);
                 void setDesiredValue(float newValue);
-                signed int scaleError(signed int scale);
+                float scaleError(float scale);
                 
                 float error;
 	private:
