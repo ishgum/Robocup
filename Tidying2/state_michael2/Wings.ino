@@ -12,18 +12,22 @@ void checkWings(void) {
        wingWait = true;
     }
     
-    //if (limitLeftWing.switchState == SWITCH_ON) {
-       //leftWing.setDesiredAngle(WINGS_TUCK);
-       //wingWait = true;
-    //}
     
-    else if (navigationState.returnState() == STATE_WALL_FOLLOW && followState.returnState() == STATE_RIGHT_WALL) {
-       rightWing.setDesiredAngle(WINGS_TUCK);
+    else if (limitLeftWing.switchState == SWITCH_ON) {
+       leftWing.setDesiredAngle(WINGS_TUCK);
+       wingWait = true;
     }
     
-//    else if (navigationState.returnState() == STATE_WALL_FOLLOW && followState.returnState() == STATE_LEFT_WALL) {
-//       leftWing.setDesiredAngle(WINGS_TUCK);
-//    }
+    else if (navigationState.returnState() == STATE_WALL_FOLLOW) {
+      if (followState.returnState() == STATE_RIGHT_WALL) {
+       rightWing.setDesiredAngle(WINGS_TUCK);
+       leftWing.setDesiredAngle(WINGS_OUT);
+      }
+      if (followState.returnState() == STATE_LEFT_WALL) {
+        leftWing.setDesiredAngle(WINGS_TUCK);
+        rightWing.setDesiredAngle(WINGS_OUT);
+    }
+    }
     
     else if (navigationState.returnState() == STATE_EVACUATE) {
       rightWing.setDesiredAngle(WINGS_TUCK);
@@ -39,6 +43,7 @@ void checkWings(void) {
     
     else {
       rightWing.setDesiredAngle(WINGS_OUT);
-      leftWing.setDesiredAngle(WINGS_TUCK);
+      leftWing.setDesiredAngle(WINGS_OUT);
     }
 }
+

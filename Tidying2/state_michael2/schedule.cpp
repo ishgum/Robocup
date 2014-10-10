@@ -34,6 +34,7 @@ bool wait (int instance, unsigned long delayTime) {
   
   else if ((millis() - prevTime[instance]) > delayTime) {
     called[instance] = false;
+    prevTime[instance] = millis();
     return true;
   }
   return false;

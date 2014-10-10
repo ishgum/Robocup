@@ -1,5 +1,5 @@
 #include "Whisker.h"
-
+#include "schedule.h"
 
 Whisker::Whisker(void){
 	count = 3000;
@@ -30,7 +30,8 @@ bool Whisker::detect (){
 	filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + freqRead;
 	freq = filter_reg >> FILTER_SHIFT;
         //Serial.print(" ");
-        //Serial.println(freq);
+          //Serial.println(freq);
+   
 	if (freq <= DETECT_THRESHOLD){
 		object = true;    
 	}

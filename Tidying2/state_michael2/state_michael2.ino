@@ -40,10 +40,15 @@ void setup() {
   
   initRobot();
   
+  pinMode(38, INPUT);
+  pinMode(39, INPUT);
+  pinMode(40, INPUT);
+  pinMode(41, INPUT);
   pinMode(42, INPUT);
   pinMode(43, INPUT);
   pinMode(44, INPUT);
   pinMode(45, INPUT);
+  
 }
 
 void WISR(void)
@@ -69,12 +74,13 @@ void initRobot(void) {
 
   rightArm.setDesiredAngle(120);
   leftArm.setDesiredAngle(40);
+  gateArm.setDesiredAngle(0);
   
   setTurnSpeed(DEFAULT_SPEED);
   setMotorSpeed(DEFAULT_SPEED);
 }
 
-
+int setMode = 0;
 // Checks the state of the on switch, if the switch is on the power is supplied to the robot
 
 void checkSwitches() {
@@ -83,8 +89,10 @@ void checkSwitches() {
   limitLeftWing.updateSwitch();
   limitRightWing.updateSwitch();
   limitFront.updateSwitch();
+  limitWeight.updateSwitch();
+
   
-  //Serial.print(limitRightWing.switchState); Serial.print('\t'); Serial.print(limitLeftWing.switchState); Serial.print('\t'); Serial.print(limitFront.switchState); Serial.print('\t'); Serial.println(limitRamp.switchState); 
+  //Serial.print(limitRightWing.switchState); Serial.print('\t'); Serial.print(limitLeftWing.switchState); Serial.print('\t'); Serial.print(limitFront.switchState); Serial.print('\t'); Serial.print(limitWeight.switchState); Serial.print('\t'); Serial.println(limitRamp.switchState); 
   
   switch (powerSwitch.switchState) {
     case SWITCH_ON:
@@ -132,7 +140,7 @@ void loop() {
   sweepAll();
   updateSensors();
   driveRobot();
-  
+
      
   switch (powerState.returnState()) {
     case STATE_ON:    

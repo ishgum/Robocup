@@ -1,5 +1,5 @@
 
-#define DETECT_BUFFER 22
+#define DETECT_BUFFER 5
 
 static int sweep_dir = STATIC;
 
@@ -16,9 +16,15 @@ void findWeights (void) {
   
   //Serial.println(whisker.detect());
   
-  if (whisker.detect() && detected == false) {         
+  
+  if (limitWeight.switchState == SWITCH_ON && weightCollect == false) {
+    weightCollect = true;
+  }
+  
+  
+  if (whisker.detect() && detected == false ) {         
      detectCount++;
-     //Serial.println("here");
+     Serial.println("here");
   }
   
   if (detectCount >= DETECT_BUFFER) {
@@ -34,13 +40,9 @@ void findWeights (void) {
     collect();
   }
   if (!whisker.detect()) {
-    detectCount = 0;
+    //detectCount = 0;
   }
-  
-  if (limitRamp.switchState == SWITCH_OFF) {
-    setMotorSpeed(DEFAULT_SPEED);
-    weightCollect = true;
-  }
+
   
 }
 
@@ -65,10 +67,10 @@ void collect(){
     case LOWER:   
       if (gateArm.checkMoving() == false) {
         if (wait(2, 500)) {
-          leftArm.setDesiredAngle(180);
           rightArm.setDesiredAngle(180);
-          sweep_dir = SWEEPING_IN;
-       }
+         leftArm.setDesiredAngle(180);
+         sweep_dir = SWEEPING_IN;
+        }
       }
     break;
     
@@ -82,18 +84,18 @@ void collect(){
     
       case WAITING:
 
-        if (weightCollect || collectAttempt == 3) {
-            weightCollect = false;
-            
-            leftArm.setDesiredAngle(0);
-            rightArm.setDesiredAngle(0);
-            sweep_dir = SWEEPING_OUT;
-        } 
-        
         if (wait(3, 2000)) {
           sweep_dir = SWEEP1;
           collectAttempt++;  
         }
+        
+        if (weightCollect || collectAttempt == 3) {
+            rightArm.setDesiredAngle(0);
+            weightCollect = false;
+            leftArm.setDesiredAngle(0);
+            sweep_dir = SWEEPING_OUT;
+        } 
+        
      break;
      
      
@@ -109,9 +111,12 @@ void collect(){
      
      case RAISE:
        if (gateArm.checkMoving() == false) {
-         sweep_dir = STATIC;
-         leftArm.setDesiredAngle(110);
-         rightArm.setDesiredAngle(110);
+         if (wait (6, 500)) {
+           sweep_dir = STATIC;
+           leftArm.setDesiredAngle(110);
+           rightArm.setDesiredAngle(110);
+         }
+
        }
      break;
      

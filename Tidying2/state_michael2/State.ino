@@ -35,7 +35,7 @@ void initStates (int changeState) {
     else if (changeState == STATE_OFF) {
         leftArm.setDesiredAngle(0);
         rightArm.setDesiredAngle(0);
-        gateArm.setDesiredAngle(120);
+        gateArm.setDesiredAngle(110);
         rightWing.setDesiredAngle(0);
         leftWing.setDesiredAngle(0);
     }
