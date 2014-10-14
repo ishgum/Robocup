@@ -181,6 +181,10 @@ void loop() {
         checkWings();
       }
       
+      if (wait(9, 60000)) {
+        navigationState.updateState(STATE_WALL_FOLLOW);
+      }
+      
   break;
   
   case STATE_OFF:

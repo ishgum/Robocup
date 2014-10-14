@@ -7,7 +7,7 @@
 
 #define CONV 250000 //for 1 clock tick every 4us (250kHz clock)
 #define DETECT_THRESHOLD_FRONT 5510 //~2740 wo serial
-#define DETECT_THRESHOLD_SIDE 3380
+#define DETECT_THRESHOLD_SIDE 3345
 #define DETECT_THRESHOLD_ROBOT 100 //GUESSING HERE
 #define FILTER_SHIFT 6
 class Whisker

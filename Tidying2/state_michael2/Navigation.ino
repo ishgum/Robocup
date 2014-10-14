@@ -95,7 +95,7 @@ void evacuateArea(void) {
       
     }
     
-    else if (evacuateStep == 2 && wait(1, 1000)) {    // Change back to searching state
+    else if (evacuateStep == 2 && wait(1, 500)) {    // Change back to searching state
         navigationState.updateState(STATE_SEARCHING);
         infaLeft.ignore = false;
         infaRight.ignore = false;

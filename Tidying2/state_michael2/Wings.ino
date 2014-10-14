@@ -3,9 +3,9 @@
 #define WINGS_TUCK 1
 #define WINGS_OUT 70
 #define WINGS_KNOCK 130
-#define LEFT_SIDE_ERROR 15
+#define LEFT_SIDE_ERROR 35
 
-#define WAIT_BUFFER 5
+#define WAIT_BUFFER 15
 
 int wingWait = false;
 bool weightFound = false;
@@ -18,7 +18,7 @@ void checkWings(void) {
     
     
     if (limitRightWing.switchState == SWITCH_ON) {
-      if (!weightFound || (weightFound == -1)) {
+      if (!weightFound || (weightFound == -1)) {  //nothing found or robot found
           tuckWaitRight++;
       }
       else if (weightFound) {

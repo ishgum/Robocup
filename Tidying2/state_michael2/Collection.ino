@@ -12,7 +12,7 @@ void findWeights (void) {
   //Serial.println(whisker.detect(DETECT_THRESHOLD_FRONT));
   foundWeight = whisker.detect(DETECT_THRESHOLD_FRONT);
     
-  if (limitRamp.switchState == SWITCH_ON && weightCollect == false) {
+  if (limitRamp.switchState == SWITCH_ON && sweep_dir == WAITING) {
     weightCollect = true;
   }
   
@@ -50,13 +50,18 @@ void collect(){
      leftArm.setDesiredAngle(0);
      rightArm.setDesiredAngle(0);
      sweepAll();
+     driveState.updateState(STATE_STOPPED);
      
     break;
     
     
     case LOWER:   
+      if (leftArm.checkMoving() == false && rightArm.checkMoving() == false) {
+        driveState.updateState(STATE_STRAIGHT);
+      }
+      
       if (gateArm.checkMoving() == false) {
-        if (wait(2, 500)) {
+        if (wait(2, 1000)) {
           rightArm.setDesiredAngle(180);
          leftArm.setDesiredAngle(180);
          sweep_dir = SWEEPING_IN;
