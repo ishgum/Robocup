@@ -1,8 +1,8 @@
 
 #include "State.h"
 
-#define STOP_DISTANCE_FRONT 400
-#define STOP_DISTANCE_SIDES 350
+#define STOP_DISTANCE_FRONT 450
+#define STOP_DISTANCE_SIDES 400
 
 #define GO_DISTANCE_FRONT 150
 #define GO_DISTANCE_SIDES 150
@@ -81,13 +81,15 @@ void avoidWall (void) {
 
 
 void evacuateArea(void) {
+  int randomTime = 0;
     if (evacuateStep == 0) {      // Drive straight backwards
             driveState.updateState(STATE_STRAIGHT);
             setMotorDir(MOTOR_BACKWARDS);
+            randomTime = random(100, 500);
             evacuateStep = 1;
           }
           
-    else if (evacuateStep == 1 && wait(1, 500)) {    // Turn
+    else if (evacuateStep == 1 && wait(1, randomTime)) {    // Turn
       setMotorDir(MOTOR_FORWARDS);
       determineWallFollow();
       driveState.updateState(STATE_TURNING);

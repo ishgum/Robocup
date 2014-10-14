@@ -61,7 +61,7 @@ void collect(){
       }
       
       if (gateArm.checkMoving() == false) {
-        if (wait(2, 1000)) {
+        if (wait(2, 1500)) {
           rightArm.setDesiredAngle(180);
          leftArm.setDesiredAngle(180);
          sweep_dir = SWEEPING_IN;

@@ -53,7 +53,7 @@ void initStates (int changeState) {
           currentSensor = determineWallFollow(); 
       }
         
-        sensorTurnAngle = SENSOR_MIDDLE - followState.returnState()*SENSOR_ANGLE;
+        sensorTurnAngle = SENSOR_MIDDLE - followState.returnState()*random(0, SENSOR_ANGLE);
         frontSensor.write(sensorTurnAngle);
     }
     
