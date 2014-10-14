@@ -41,4 +41,8 @@ bool wait (int instance, unsigned long delayTime) {
 }
   
   
+void resetWait (int instance) {
+  called[instance] = false;
+}
+  
   

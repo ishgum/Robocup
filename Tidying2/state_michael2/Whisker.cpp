@@ -11,8 +11,8 @@ Whisker::Whisker(void){
 	object = false;
 }
 
-
-bool Whisker::detect (){
+int t_tick = 0;
+bool Whisker::detect (int detect_threshold){
  	cli(); //critical section
 	time = TCNT1;
 	pulses = count; 
@@ -30,12 +30,18 @@ bool Whisker::detect (){
 	filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + freqRead;
 	freq = filter_reg >> FILTER_SHIFT;
         //Serial.print(" ");
-          //Serial.println(freq);
-   
-	if (freq <= DETECT_THRESHOLD){
+        //Serial.println(freq);
+   t_tick++;
+   if (t_tick>1000 && detect_threshold == DETECT_THRESHOLD_SIDE ){
+   Serial.println(freq);
+   t_tick = 0;
+   }
+        if (freq <= DETECT_THRESHOLD_ROBOT){
+                object = -1;
+        }
+	else if (freq <= detect_threshold){
 		object = true;    
-	}
-	else{
+        }else{
 		object = false;
 	}  
 	return object;

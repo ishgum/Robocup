@@ -36,7 +36,7 @@
   
   
   Whisker whisker;
-  
+  Whisker sideWhisker;
   
   Sensors infaFront(4);
   Sensors infaLeft(0);
@@ -72,7 +72,7 @@
 
 // State things  
   
- int leftValue = MOTOR_ZERO_VALUE;
+int leftValue = MOTOR_ZERO_VALUE;
 int rightValue = MOTOR_ZERO_VALUE;
 
 // RTOS

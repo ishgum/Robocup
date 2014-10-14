@@ -8,6 +8,18 @@
 #include "state_michael2.h"
 
 
+
+static int sweep_dir = SWEEP1;
+
+static bool weightCollect = false;
+static bool detected = false;
+static bool foundWeight = false;
+
+static int detectCount = 0;
+static int collectAttempt = 0;
+
+
+
   
 void setup() {
   Serial.begin(9600);
@@ -31,6 +43,8 @@ void setup() {
     cli();
   attachInterrupt(4, WISR, FALLING); //enable interrupt0 (pin2)
   pinMode(19, INPUT);
+  attachInterrupt(5, SWISR, FALLING); //enable interrupt0 (pin2)
+  pinMode(20, INPUT);
   TCCR1A = 0x00; //normal operation mode
   TCCR1B = 0x03; //64x prescale for 250kHz clock
   TCNT1=0x0000; //16bit counter register initialised to 0
@@ -56,6 +70,10 @@ void WISR(void)
     whisker.count++;
 }
 
+void SWISR(void){
+    sideWhisker.count++; 
+}
+
 
 
 void initRobot(void) {
@@ -72,12 +90,15 @@ void initRobot(void) {
 
   frontSensor.write(SENSOR_MIDDLE);
 
-  rightArm.setDesiredAngle(120);
-  leftArm.setDesiredAngle(40);
-  gateArm.setDesiredAngle(0);
+//  rightArm.setDesiredAngle(120);
+//  leftArm.setDesiredAngle(40);
+//  gateArm.setDesiredAngle(0);
   
   setTurnSpeed(DEFAULT_SPEED);
   setMotorSpeed(DEFAULT_SPEED);
+  
+  detected = true;
+  weightCollect = true;
 }
 
 int setMode = 0;
@@ -144,8 +165,7 @@ void loop() {
      
   switch (powerState.returnState()) {
     case STATE_ON:    
-      findWeights();
-      
+      findWeights(); //detect()returns -1 when robot found      
       if (tick % 100 == 0) {
         //checkColour();
       }

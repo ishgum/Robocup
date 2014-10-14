@@ -15,7 +15,7 @@
 #define MOTOR_CCW 1
 
 #define DEFAULT_SPEED 90
-#define MIN_SPEED 70
+#define MIN_SPEED 50
 
 
 #endif

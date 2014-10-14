@@ -1,49 +1,39 @@
 
 #define DETECT_BUFFER 5
 
-static int sweep_dir = STATIC;
 
 
-static bool weightCollect = false;
-static bool detected = false;
 
-static int detectCount = 0;
-static int collectAttempt = 0;
 
 
 
 void findWeights (void) {
   
-  //Serial.println(whisker.detect());
-  
-  
-  if (limitWeight.switchState == SWITCH_ON && weightCollect == false) {
+  //Serial.println(whisker.detect(DETECT_THRESHOLD_FRONT));
+  foundWeight = whisker.detect(DETECT_THRESHOLD_FRONT);
+    
+  if (limitRamp.switchState == SWITCH_ON && weightCollect == false) {
     weightCollect = true;
   }
   
   
-  if (whisker.detect() && detected == false ) {         
+  if (foundWeight && limitWeight.switchState == SWITCH_ON && detected == false) {         
      detectCount++;
      Serial.println("here");
   }
   
-  if (detectCount >= DETECT_BUFFER) {
+  if (detectCount == DETECT_BUFFER) {
     sweep_dir = SWEEP1;
     setMotorSpeed(MIN_SPEED);
     detectCount = 0;
     collectAttempt = 0;
     detected = true;
-    Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    //Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
   }
   
   if (detected == true) {
     collect();
   }
-  if (!whisker.detect()) {
-    //detectCount = 0;
-  }
-
-  
 }
 
 void collect(){
@@ -53,7 +43,7 @@ void collect(){
     case SWEEP1:
     
      if(leftArm.checkMoving() == false && rightArm.checkMoving() == false){
-       gateArm.setDesiredAngle(50);
+       gateArm.setDesiredAngle(0);
        sweep_dir = LOWER;
      }
      
@@ -89,12 +79,17 @@ void collect(){
           collectAttempt++;  
         }
         
-        if (weightCollect || collectAttempt == 3) {
+        if (weightCollect || collectAttempt == 2) {
             rightArm.setDesiredAngle(0);
             weightCollect = false;
             leftArm.setDesiredAngle(0);
             sweep_dir = SWEEPING_OUT;
+            resetWait(3);
         } 
+        
+        if (collectAttempt == 2) {
+          navigationState.updateState(STATE_EVACUATE);
+        }
         
      break;
      
@@ -125,6 +120,7 @@ void collect(){
        if(leftArm.checkMoving() == false && rightArm.checkMoving() == false && gateArm.checkMoving() == false){
          detected = false;
          setMotorSpeed(DEFAULT_SPEED);
+         sweep_dir = SWEEP1;
        }
      break;     
      }

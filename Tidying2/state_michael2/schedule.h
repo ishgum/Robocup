@@ -17,5 +17,6 @@ class schedule{
 
 
 bool wait (int instance, unsigned long delayTime);
+void resetWait(int instance);
 
 #endif

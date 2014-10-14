@@ -64,7 +64,7 @@ void initStates (int changeState) {
     else if (changeState == STATE_SEARCHING) {
         leftError.error = 0;
         rightError.error = 0;
-        currentError.error = 150;
+        currentError.error = 0;
     }
     
     else if (changeState == STATE_EVACUATE) {
